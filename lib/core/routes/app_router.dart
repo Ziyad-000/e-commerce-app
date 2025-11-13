@@ -1,4 +1,6 @@
+import 'package:ecommerce_app/features/products/models/product_model.dart';
 import 'package:ecommerce_app/features/products/views/main_layout.dart';
+import 'package:ecommerce_app/features/products/views/pages/product_details_screen.dart';
 import 'package:ecommerce_app/features/products/views/pages/product_screen.dart';
 import 'package:flutter/material.dart';
 import '../../features/auth/presentation/pages/splach_screen.dart';
@@ -17,9 +19,24 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) {
             final categoryName = settings.arguments.toString();
-            return ProductScreen(categoryName: categoryName,);
+            return ProductScreen(categoryName: categoryName);
           },
         );
+
+      case AppRoutes.productDetailsRoute:
+        return MaterialPageRoute(
+          builder: (context) {
+            final ProductModel productName = settings.arguments as ProductModel;
+            return ProductDetailsScreen(product: productName);
+          },
+        );
+
+      // case AppRoutes.loginRoute:
+
+      // case AppRoutes.productDetailsRoute:
+      //   final String productId = settings.arguments as String;
+      //   return MaterialPageRoute(builder: (_) => ProductDetailsScreen(productId: productId));
+
       // case AppRoutes.loginRoute:
       // // return MaterialPageRoute(builder: (_) => const LoginScreen());
 
@@ -36,9 +53,6 @@ class AppRouter {
       // // return MaterialPageRoute(builder: (_) => const CartScreen());
 
       //
-      // case AppRoutes.productDetailsRoute:
-      //   final String productId = settings.arguments as String;
-      //   // return MaterialPageRoute(builder: (_) => ProductDetailsScreen(productId: productId));
 
       //
       // case AppRoutes.orderDetailsRoute:

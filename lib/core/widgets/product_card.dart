@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import '../../features/products/models/product_model.dart';
 import '../theme/app_theme.dart';
@@ -19,9 +20,15 @@ class ProductCard extends StatelessWidget {
               .round()
         : 0;
 
-    return GestureDetector(
+    return InkWell(
       onTap: () {
-        // Navigator.pushNamed(context, AppRoutes.productDetailsRoute, arguments: product.id);
+        print('hello');
+        Navigator.pushNamed(
+          context,
+          AppRoutes.productDetailsRoute,
+          arguments: product,
+        );
+        //Navigator.pushNamed(context, AppRoutes.productDetailsRoute, arguments: product.id);
       },
       child: Card(
         clipBehavior: Clip.antiAlias,
