@@ -17,7 +17,7 @@ class _ProductScreenState extends State<ProductScreen> {
       id: '0',
       name: 'Cotton T-shirt Regular Fit',
       description:
-          'T-shirt in soft cotton jersey. Regular Fit.Article Number0685816290Age GroupAdultPresentation Product TypeT-shirt',
+          'Made from Premium cotton blend for ultimate comfort',
       imageUrl:
           'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
       price: 9.99,
@@ -28,7 +28,7 @@ class _ProductScreenState extends State<ProductScreen> {
       id: '1',
       name: 'Cotton T-shirt Regular Fit',
       description:
-          'T-shirt in soft cotton jersey. Regular Fit.Article Number0685816290Age GroupAdultPresentation Product TypeT-shirt',
+          'Made from Premium cotton blend for ultimate comfort',
       imageUrl:
           'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
       price: 29.99,
@@ -39,7 +39,7 @@ class _ProductScreenState extends State<ProductScreen> {
       id: '2',
       name: 'Cotton T-shirt Regular Fit',
       description:
-          'T-shirt in soft cotton jersey. Regular Fit.Article Number0685816290Age GroupAdultPresentation Product TypeT-shirt',
+          'Made from Premium cotton blend for ultimate comfort',
       imageUrl:
           'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
       price: 39.99,
@@ -50,7 +50,7 @@ class _ProductScreenState extends State<ProductScreen> {
       id: '3',
       name: 'Cotton T-shirt Regular Fit',
       description:
-          'T-shirt in soft cotton jersey. Regular Fit.Article Number0685816290Age GroupAdultPresentation Product TypeT-shirt',
+          'Made from Premium cotton blend for ultimate comfort',
       imageUrl:
           'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
       price: 49.99,

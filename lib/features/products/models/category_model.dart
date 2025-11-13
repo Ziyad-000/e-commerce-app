@@ -3,7 +3,7 @@ class CategoryModel {
   final String name;
   final int CategoryNumber;
   final String imageUrl;
-  
+
   CategoryModel({
     required this.id,
     required this.name,
@@ -13,12 +13,12 @@ class CategoryModel {
 
   Map<String, dynamic> toMap() {
     final result = <String, dynamic>{};
-  
+
     result.addAll({'id': id});
     result.addAll({'name': name});
     result.addAll({'CategoryNumber': CategoryNumber});
     result.addAll({'imageUrl': imageUrl});
-  
+
     return result;
   }
 
@@ -30,5 +30,4 @@ class CategoryModel {
       imageUrl: map['imageUrl'] ?? '',
     );
   }
-
 }

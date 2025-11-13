@@ -92,32 +92,39 @@ class CategoriesView extends StatelessWidget {
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                categories[index].name,
-                                style: TextStyle(
-                                  color: AppColors.foreground,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                '${categories[index].CategoryNumber} items',
-                                style: TextStyle(
-                                  color: AppColors.secondary,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
+                      child: Stack(
+                        alignment: AlignmentDirectional.bottomStart,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: 55,
+                            color: Colors.black45,
                           ),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  categories[index].name,
+                                  style: TextStyle(
+                                    color: AppColors.foreground,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  '${categories[index].CategoryNumber} items',
+                                  style: TextStyle(
+                                    color: AppColors.secondary,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
