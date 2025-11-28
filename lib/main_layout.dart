@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'core/widgets/custom_app_bar.dart';
 import 'core/widgets/custom_bottom_nav_bar.dart';
 import 'core/widgets/custom_drawer.dart';
+import 'features/cart/views/pages/cart_screen.dart';
 import 'features/search/views/pages/search_screen.dart';
 
 class CartView extends StatelessWidget {
@@ -34,7 +35,7 @@ class _MainLayoutState extends State<MainLayout> {
     const HomePage(),
     const CategoriesView(),
     const SearchScreen(),
-    const CartView(),
+    const CartScreen(),
     const ProfileView(),
   ];
 
