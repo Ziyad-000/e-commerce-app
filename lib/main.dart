@@ -4,10 +4,13 @@ import 'package:provider/provider.dart';
 import 'core/routes/app_router.dart';
 import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart';
+import 'features/cart/providers/cart_provider.dart';
+import 'features/favorites/providers/favorites_provider.dart';
 import 'features/products/providers/product_provider.dart';
 import 'features/products/providers/category_provider.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'features/search/providers/search_provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -25,6 +28,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => SearchProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
       ],
       child: MaterialApp(
         title: 'Fashion Store',

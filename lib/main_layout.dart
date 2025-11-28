@@ -1,18 +1,10 @@
 import 'package:ecommerce_app/features/products/views/pages/category_screen.dart';
 import 'package:ecommerce_app/features/products/views/pages/home_screen.dart';
 import 'package:flutter/material.dart';
-import '../../../core/widgets/custom_app_bar.dart';
-import '../../../core/widgets/custom_bottom_nav_bar.dart';
-import '../../../core/widgets/custom_drawer.dart';
-
-
-
-class SearchView extends StatelessWidget {
-  const SearchView({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Search Page')));
-}
+import 'core/widgets/custom_app_bar.dart';
+import 'core/widgets/custom_bottom_nav_bar.dart';
+import 'core/widgets/custom_drawer.dart';
+import 'features/search/views/pages/search_screen.dart';
 
 class CartView extends StatelessWidget {
   const CartView({super.key});
@@ -41,7 +33,7 @@ class _MainLayoutState extends State<MainLayout> {
   final List<Widget> _pages = [
     const HomePage(),
     const CategoriesView(),
-    const SearchView(),
+    const SearchScreen(),
     const CartView(),
     const ProfileView(),
   ];
