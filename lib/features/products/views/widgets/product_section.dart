@@ -17,47 +17,71 @@ class ProductSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(title, style: Theme.of(context).textTheme.displaySmall),
-            InkWell(
-              onTap: onSeeAll,
-              child: Row(
-                children: [
-                  Text(
-                    'See All',
-                    style: Theme.of(context).textTheme.bodyMedium,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // العنوان مع See All
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.foreground,
                   ),
-                  const SizedBox(width: 8.0),
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 12.0,
-                    color: AppColors.mutedForeground,
-                  ),
-                ],
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16.0),
-        SizedBox(
-          height: 280.0,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: ProductCard(product: products[index]),
-              );
-            },
+              TextButton(
+                onPressed: onSeeAll,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(60, 32),
+                ),
+                child: const Text(
+                  'See all',
+                  style: TextStyle(
+                    color: AppColors.mutedForeground,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: 12),
+
+          // Grid المنتجات (2 columns)
+          if (products.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: Text(
+                  'No products available',
+                  style: TextStyle(color: AppColors.mutedForeground),
+                ),
+              ),
+            )
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.65,
+              ),
+              itemCount: products.length > 6 ? 6 : products.length,
+              itemBuilder: (context, index) {
+                return ProductCard(product: products[index]);
+              },
+            ),
+        ],
+      ),
     );
   }
 }

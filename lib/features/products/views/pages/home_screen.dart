@@ -1,313 +1,212 @@
 import 'package:ecommerce_app/core/theme/app_theme.dart';
+import 'package:ecommerce_app/features/products/providers/product_provider.dart';
 import 'package:flutter/material.dart';
-
-import '../../models/product_model.dart';
-import '../widgets/featured_products.dart';
+import 'package:provider/provider.dart';
 import '../widgets/product_section.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<ProductModel> recommendedProducts = [
-      ProductModel(
-        id: '1',
-        name: 'Premium T-Shirt',
-        imageUrl: 'url1',
-        price: 29.99,
-        rating: 4.8,
-        description: '',
-        category: '',
-      ),
-      ProductModel(
-        id: '2',
-        name: 'Classic Sneaker',
-        imageUrl: 'url2',
-        price: 89.99,
-        rating: 4.6,
-        description: '',
-        category: '',
-      ),
-      ProductModel(
-        id: '5',
-        name: 'Leather Boots',
-        imageUrl: 'url5',
-        price: 120.00,
-        rating: 4.9,
-        description: '',
-        category: '',
-      ),
-      ProductModel(
-        id: '6',
-        name: 'Casual Hat',
-        imageUrl: 'url6',
-        price: 25.50,
-        rating: 4.3,
-        description: '',
-        category: '',
-      ),
-    ];
+  State<HomePage> createState() => _HomePageState();
+}
 
-    final List<ProductModel> onSaleProducts = [
-      ProductModel(
-        id: '3',
-        name: 'Summer Dress',
-        imageUrl: 'url3',
-        price: 49.99,
-        rating: 4.5,
-        description: '',
-        category: '',
-      ),
-      ProductModel(
-        id: '4',
-        name: 'Men\'s Jacket',
-        imageUrl: 'url4',
-        price: 115.20,
-        rating: 4.7,
-        description: '',
-        category: '',
-      ),
-      ProductModel(
-        id: '7',
-        name: 'Sports Watch',
-        imageUrl: 'url7',
-        price: 199.99,
-        rating: 4.4,
-        description: '',
-        category: '',
-      ),
-      ProductModel(
-        id: '8',
-        name: 'Running Shoes',
-        imageUrl: 'url8',
-        price: 75.00,
-        rating: 4.6,
-        description: '',
-        category: '',
-      ),
-    ];
-    final List<ProductModel> featuredProducts = [
-      ProductModel(
-        id: '8',
-        name: 'Luxury Watch',
-        description: 'desc',
-        imageUrl: 'https://via.placeholder.com/150',
-        price: 250.00,
-        rating: 4.9,
-        category: 'Accessories',
-      ),
-      ProductModel(
-        id: '9',
-        name: 'Designer Handbag',
-        description: 'desc',
-        imageUrl: 'https://via.placeholder.com/150',
-        price: 180.00,
-        rating: 4.7,
-        category: 'Women',
-      ),
-      ProductModel(
-        id: '10',
-        name: 'Gaming Headset',
-        description: 'desc',
-        imageUrl: 'https://via.placeholder.com/150',
-        price: 75.00,
-        rating: 4.5,
-        category: 'Electronics',
-      ),
-      ProductModel(
-        id: '11',
-        name: 'Smart Fitness Tracker',
-        description: 'desc',
-        imageUrl: 'https://via.placeholder.com/150',
-        price: 50.00,
-        rating: 4.4,
-        category: 'Electronics',
-      ),
-    ];
+class _HomePageState extends State<HomePage> {
+  String selectedCategory = 'Men';
+
+  @override
+  void initState() {
+    super.initState();
+    // جلب المنتجات عند فتح الصفحة
+    Future.microtask(() async {
+      final provider = context.read<ProductProvider>();
+      await provider.fetchAllProducts();
+      await provider.fetchFeaturedProducts();
+      await provider.fetchDiscountedProducts();
+
+      // Debug فقط
+      debugPrint('🔥 Total products: ${provider.allProducts.length}');
+      debugPrint('🔥 Featured: ${provider.featuredProducts.length}');
+      debugPrint('🔥 Discounted: ${provider.discountedProducts.length}');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: 175,
-                child: Card(
-                  shape: RoundedRectangleBorder(
+      body: Consumer<ProductProvider>(
+        builder: (context, productProvider, child) {
+          // لو بيحمّل
+          if (productProvider.isLoading &&
+              productProvider.allProducts.isEmpty) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.accent),
+            );
+          }
+
+          // لو فيه خطأ
+          if (productProvider.errorMessage != null &&
+              productProvider.allProducts.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    productProvider.errorMessage!,
+                    style: const TextStyle(color: AppColors.destructive),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      productProvider.fetchAllProducts();
+                      productProvider.fetchFeaturedProducts();
+                      productProvider.fetchDiscountedProducts();
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. Special Offers Banner
+                Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.destructive,
                     borderRadius: BorderRadius.circular(
                       AppConstants.borderRadius,
                     ),
                   ),
-                  color: AppColors.accent,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppConstants.paddingXL,
-                      vertical: AppConstants.paddingL,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Special Offers',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Text(
+                        'Up to 50% off on selected items',
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.destructive,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text('Shop Now'),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 2. Categories Tabs
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Special Offers',
-                              style: theme.textTheme.displayMedium,
-                            ),
-                            Spacer(),
-                            IconButton(
-                              onPressed: () {
-                                // Close the card
-                                Navigator.of(context).pop();
-                              },
-                              icon: Icon(
-                                Icons.close,
-                                color: AppColors.accentForeground,
-                                size: 18,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          'Up to 50% off on selected items',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: AppColors.accentForeground,
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.accentForeground,
-                            foregroundColor: AppColors.accent,
-                          ),
-                          child: Text(
-                            'Shop Now',
-                            style: theme.elevatedButtonTheme.style?.textStyle
-                                ?.resolve({}),
-                          ),
-                        ),
+                        _buildCategoryTab('Men'),
+                        _buildCategoryTab('Women'),
+                        _buildCategoryTab('Kids'),
+                        _buildCategoryTab('New'),
+                        _buildCategoryTab('Sale'),
                       ],
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    TextButton(
-                      onPressed: () {},
-                      child: Text('Mens'),
-                      style: TextButton.styleFrom(
-                        backgroundColor: AppColors.surface2.withAlpha(200),
-                        foregroundColor: AppColors.foreground,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        textStyle: theme.textTheme.labelLarge,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppConstants.paddingXXL,
-                          vertical: AppConstants.paddingL,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text('Womens'),
-                      style: TextButton.styleFrom(
-                        backgroundColor: AppColors.surface2.withAlpha(200),
-                        foregroundColor: AppColors.foreground,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        textStyle: theme.textTheme.labelLarge,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppConstants.paddingXXL,
-                          vertical: AppConstants.paddingL,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text('Kids'),
-                      style: TextButton.styleFrom(
-                        backgroundColor: AppColors.surface2.withAlpha(200),
-                        foregroundColor: AppColors.foreground,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        textStyle: theme.textTheme.labelLarge,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppConstants.paddingXXL,
-                          vertical: AppConstants.paddingL,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text('News'),
-                      style: TextButton.styleFrom(
-                        backgroundColor: AppColors.surface2.withAlpha(200),
-                        foregroundColor: AppColors.foreground,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        textStyle: theme.textTheme.labelLarge,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppConstants.paddingXXL,
-                          vertical: AppConstants.paddingL,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text('Sports'),
-                      style: TextButton.styleFrom(
-                        backgroundColor: AppColors.surface2.withAlpha(200),
-                        foregroundColor: AppColors.foreground,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        textStyle: theme.textTheme.labelLarge,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppConstants.paddingXXL,
-                          vertical: AppConstants.paddingL,
-                        ),
-                      ),
-                    ),
-                  ],
+
+                const SizedBox(height: 24),
+
+                // 3. Recommended for you
+                ProductSection(
+                  title: 'Recommended for you',
+                  products: productProvider.allProducts.take(6).toList(),
+                  onSeeAll: () {},
                 ),
-              ),
-              const SizedBox(height: 24),
-              ProductSection(
-                title: 'Recommended for you',
-                products: recommendedProducts,
-                onSeeAll: () {},
-              ),
-              const SizedBox(height: 24),
-              ProductSection(
-                title: 'On Sale',
-                products: onSaleProducts,
-                onSeeAll: () {},
-              ),
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              FeaturedProductsSection(
-                title: 'Featured Products',
-                products: featuredProducts,
-              ),
-            ],
+                // 4. On Sale
+                ProductSection(
+                  title: 'On Sale',
+                  products: productProvider.discountedProducts.take(6).toList(),
+                  onSeeAll: () {},
+                ),
+
+                const SizedBox(height: 24),
+
+                // 5. Featured Products
+                ProductSection(
+                  title: 'Featured Products',
+                  products: productProvider.featuredProducts.take(6).toList(),
+                  onSeeAll: () {},
+                ),
+
+                const SizedBox(height: 24),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategoryTab(String title) {
+    final isSelected = selectedCategory == title;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            selectedCategory = title;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.foreground : AppColors.surface2,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            title,
+            style: TextStyle(
+              color: isSelected ? AppColors.background : AppColors.foreground,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
       ),
