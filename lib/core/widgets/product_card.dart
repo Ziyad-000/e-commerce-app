@@ -1,6 +1,8 @@
 import 'package:ecommerce_app/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:provider/provider.dart';
+import '../../features/favorites/providers/favorites_provider.dart';
 import '../../features/products/models/product_model.dart';
 import '../theme/app_theme.dart';
 
@@ -33,10 +35,8 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // الصورة مع الـ Badges
             Stack(
               children: [
-                // الصورة
                 Image.network(
                   product.imageUrl,
                   height: 150,
@@ -56,8 +56,6 @@ class ProductCard extends StatelessWidget {
                     );
                   },
                 ),
-
-                // Sale Badge (لو فيه خصم)
                 if (onSale)
                   Positioned(
                     top: AppConstants.paddingM,
@@ -81,34 +79,41 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                // Heart Icon (Favorite)
                 Positioned(
                   top: AppConstants.paddingM,
                   right: AppConstants.paddingM,
-                  child: CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Colors.white,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: const Icon(Icons.favorite_border, size: 18),
-                      color: Colors.black,
-                      onPressed: () {
-                        // Add to favorites
-                      },
-                    ),
+                  child: Consumer<FavoritesProvider>(
+                    builder: (context, favProvider, child) {
+                      final isFav = favProvider.isFavorite(product.id);
+                      return CircleAvatar(
+                        radius: 16,
+                        backgroundColor: Colors.white,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            size: 18,
+                          ),
+                          color: isFav ? Colors.red : Colors.black,
+                          onPressed: () {
+                            if (isFav) {
+                              favProvider.removeFavoriteProduct(product.id);
+                            } else {
+                              favProvider.addFavoriteProduct(product);
+                            }
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
             ),
-
-            // معلومات المنتج
             Padding(
               padding: const EdgeInsets.all(AppConstants.paddingL),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // اسم المنتج
                   Text(
                     product.name,
                     style: textTheme.titleMedium?.copyWith(
@@ -118,8 +123,6 @@ class ProductCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 6),
-
-                  // التقييم
                   Row(
                     children: [
                       RatingBarIndicator(
@@ -140,11 +143,8 @@ class ProductCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-
-                  // السعر
                   Row(
                     children: [
-                      // السعر الحالي
                       Text(
                         '\$${product.price.toStringAsFixed(2)}',
                         style: textTheme.titleMedium?.copyWith(
@@ -152,8 +152,6 @@ class ProductCard extends StatelessWidget {
                           color: AppColors.foreground,
                         ),
                       ),
-
-                      // السعر القديم (لو فيه خصم)
                       if (product.oldPrice != null)
                         Padding(
                           padding: const EdgeInsets.only(left: 8),

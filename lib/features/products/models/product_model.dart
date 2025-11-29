@@ -6,14 +6,16 @@ class ProductModel {
   final double price;
   final double? oldPrice;
   final double rating;
+  final int reviewCount;
   final bool isFeatured;
   final String? size;
   final int? quantity;
   final double? discount;
   final double? finalPrice;
   final int? color;
-
   final String category;
+  final List<String>? sizes;
+  final int? stock;
 
   ProductModel({
     required this.id,
@@ -23,6 +25,7 @@ class ProductModel {
     required this.price,
     this.oldPrice,
     required this.rating,
+    this.reviewCount = 0,
     required this.category,
     this.isFeatured = false,
     this.size,
@@ -30,6 +33,8 @@ class ProductModel {
     this.quantity,
     this.discount,
     this.finalPrice,
+    this.sizes,
+    this.stock,
   });
 
   Map<String, dynamic> toMap() {
@@ -42,6 +47,7 @@ class ProductModel {
     result.addAll({'price': price});
     if (oldPrice != null) result.addAll({'oldPrice': oldPrice});
     result.addAll({'rating': rating});
+    result.addAll({'reviewCount': reviewCount});
     result.addAll({'category': category});
     result.addAll({'isFeatured': isFeatured});
     if (size != null) result.addAll({'size': size});
@@ -49,6 +55,8 @@ class ProductModel {
     if (quantity != null) result.addAll({'Quantity': quantity});
     if (discount != null) result.addAll({'discount': discount});
     if (finalPrice != null) result.addAll({'finalPrice': finalPrice});
+    if (sizes != null) result.addAll({'sizes': sizes});
+    if (stock != null) result.addAll({'stock': stock});
 
     return result;
   }
@@ -84,6 +92,14 @@ class ProductModel {
         }
       }
 
+      // ← Parse sizes
+      List<String>? sizesList;
+      if (map['sizes'] != null) {
+        if (map['sizes'] is List) {
+          sizesList = List<String>.from(map['sizes']);
+        }
+      }
+
       return ProductModel(
         id: map['id']?.toString() ?? '',
         name: map['name']?.toString() ?? '',
@@ -92,6 +108,9 @@ class ProductModel {
         price: productPrice,
         oldPrice: productOldPrice,
         rating: map['rating'] != null ? _toDouble(map['rating']) : 0.0,
+        reviewCount: map['reviewCount'] != null
+            ? _toInt(map['reviewCount'])
+            : 0,
         category: map['category']?.toString() ?? '',
         isFeatured: map['isFeatured'] == true,
         size: map['size']?.toString(),
@@ -101,6 +120,8 @@ class ProductModel {
         finalPrice: map['finalPrice'] != null
             ? _toDouble(map['finalPrice'])
             : null,
+        sizes: sizesList,
+        stock: map['stock'] != null ? _toInt(map['stock']) : null,
       );
     } catch (e) {
       rethrow;

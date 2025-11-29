@@ -16,8 +16,7 @@ class _ProductScreenState extends State<ProductScreen> {
     ProductModel(
       id: '0',
       name: 'Cotton T-shirt Regular Fit',
-      description:
-          'Made from Premium cotton blend for ultimate comfort',
+      description: 'Made from Premium cotton blend for ultimate comfort',
       imageUrl:
           'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
       price: 9.99,
@@ -27,8 +26,7 @@ class _ProductScreenState extends State<ProductScreen> {
     ProductModel(
       id: '1',
       name: 'Cotton T-shirt Regular Fit',
-      description:
-          'Made from Premium cotton blend for ultimate comfort',
+      description: 'Made from Premium cotton blend for ultimate comfort',
       imageUrl:
           'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
       price: 29.99,
@@ -38,8 +36,7 @@ class _ProductScreenState extends State<ProductScreen> {
     ProductModel(
       id: '2',
       name: 'Cotton T-shirt Regular Fit',
-      description:
-          'Made from Premium cotton blend for ultimate comfort',
+      description: 'Made from Premium cotton blend for ultimate comfort',
       imageUrl:
           'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
       price: 39.99,
@@ -49,8 +46,7 @@ class _ProductScreenState extends State<ProductScreen> {
     ProductModel(
       id: '3',
       name: 'Cotton T-shirt Regular Fit',
-      description:
-          'Made from Premium cotton blend for ultimate comfort',
+      description: 'Made from Premium cotton blend for ultimate comfort',
       imageUrl:
           'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
       price: 49.99,
@@ -184,7 +180,6 @@ class _ProductScreenState extends State<ProductScreen> {
                                     });
                                   });
                                 },
-                                child: Text('Price: Low to High'),
                                 style: TextButton.styleFrom(
                                   backgroundColor: AppColors.surface2.withAlpha(
                                     200,
@@ -198,6 +193,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                     vertical: AppConstants.paddingL,
                                   ),
                                 ),
+                                child: Text('Price: Low to High'),
                               ),
                             ),
                             TextButton(
@@ -210,7 +206,6 @@ class _ProductScreenState extends State<ProductScreen> {
                                   });
                                 });
                               },
-                              child: Text('Price: High to Low'),
                               style: TextButton.styleFrom(
                                 backgroundColor: AppColors.surface2.withAlpha(
                                   200,
@@ -224,6 +219,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                   vertical: AppConstants.paddingL,
                                 ),
                               ),
+                              child: Text('Price: High to Low'),
                             ),
                             TextButton(
                               onPressed: () {
@@ -235,7 +231,6 @@ class _ProductScreenState extends State<ProductScreen> {
                                   });
                                 });
                               },
-                              child: Text('Rating'),
                               style: TextButton.styleFrom(
                                 backgroundColor: AppColors.surface2.withAlpha(
                                   200,
@@ -249,6 +244,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                   vertical: AppConstants.paddingL,
                                 ),
                               ),
+                              child: Text('Rating'),
                             ),
                           ],
                         ),

@@ -35,12 +35,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // المحتوى
           SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // صورة المنتج (بدون Sale Badge)
                 Stack(
                   children: [
                     Image.network(
@@ -60,8 +58,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         );
                       },
                     ),
-
-                    // Back Button
                     Positioned(
                       top: 40,
                       left: 16,
@@ -76,8 +72,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                     ),
-
-                    // Favorite Button
                     Positioned(
                       top: 40,
                       right: 16,
@@ -94,7 +88,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 color: isFav ? Colors.red : Colors.black,
                               ),
                               onPressed: () {
-                                favProvider.toggleFavorite(widget.product.id);
+                                if (isFav) {
+                                  favProvider.removeFavoriteProduct(
+                                    widget.product.id,
+                                  );
+                                } else {
+                                  favProvider.addFavoriteProduct(
+                                    widget.product,
+                                  );
+                                }
                               },
                             ),
                           );
@@ -103,14 +105,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                   ],
                 ),
-
-                // معلومات المنتج
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // اسم المنتج + Sale Badge
                       Row(
                         children: [
                           Expanded(
@@ -123,8 +122,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ),
                             ),
                           ),
-
-                          // Sale Badge جنب الاسم
                           if (onSale)
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -147,11 +144,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-
-                      // السعر
                       Row(
                         children: [
-                          // السعر الحالي (كبير)
                           Text(
                             '\$${widget.product.price.toStringAsFixed(2)}',
                             style: const TextStyle(
@@ -161,8 +155,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-
-                          // السعر القديم (أصغر ومشطوب)
                           if (widget.product.oldPrice != null)
                             Text(
                               '\$${widget.product.oldPrice!.toStringAsFixed(2)}',
@@ -175,8 +167,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-
-                      // التقييم (تحت السعر)
                       Row(
                         children: [
                           const Icon(
@@ -195,7 +185,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '(324 reviews)',
+                            '(${widget.product.reviewCount} reviews)',
                             style: const TextStyle(
                               color: AppColors.mutedForeground,
                               fontSize: 14,
@@ -204,8 +194,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-
-                      // الوصف
                       Text(
                         widget.product.description.isNotEmpty
                             ? widget.product.description
@@ -217,8 +205,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-
-                      // Size Selector
                       const Text(
                         'Size',
                         style: TextStyle(
@@ -270,8 +256,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         }).toList(),
                       ),
                       const SizedBox(height: 24),
-
-                      // Color Selector
                       const Text(
                         'Color',
                         style: TextStyle(
@@ -311,8 +295,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         }),
                       ),
                       const SizedBox(height: 24),
-
-                      // Quantity Selector
                       const Text(
                         'Quantity',
                         style: TextStyle(
@@ -367,15 +349,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 100), // مساحة للأزرار
+                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-
-          // الأزرار في الأسفل
           Positioned(
             bottom: 0,
             left: 0,
@@ -394,16 +374,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
               child: Row(
                 children: [
-                  // Add to Cart
-                  // Add to Cart
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        // تأكد إن الكود ده موجود
-                        debugPrint('🔍 Selected Size: $selectedSize');
-                        debugPrint('🔍 Selected Color: $selectedColor');
-
-                        // إضافة للـ Cart
                         for (int i = 0; i < quantity; i++) {
                           context.read<CartProvider>().addToCart(
                             widget.product,
@@ -411,13 +384,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             color: selectedColor,
                           );
                         }
-
-                        // عرض الـ Bottom Sheet
                         AddToCartBottomSheet.show(
                           context,
                           product: widget.product,
-                          selectedSize: selectedSize, // ← تأكد من ده
-                          selectedColor: selectedColor, // ← وده
+                          selectedSize: selectedSize,
+                          selectedColor: selectedColor,
                           quantity: quantity,
                         );
                       },
@@ -430,15 +401,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
-                  // Buy Now
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to checkout
-                      },
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.destructive,
                         foregroundColor: Colors.white,
