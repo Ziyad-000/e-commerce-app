@@ -1,33 +1,46 @@
 import 'package:flutter/material.dart';
-import '../services/favorites_service.dart';
+import '../../products/models/product_model.dart';
 
-class FavoritesProvider extends ChangeNotifier {
-  final FavoritesService _favoritesService = FavoritesService();
-  List<String> _favoriteIds = [];
+class FavoritesProvider with ChangeNotifier {
+  final Set<String> _favoriteIds = {};
+  final List<ProductModel> _favorites = [];
 
-  List<String> get favoriteIds => _favoriteIds;
+  Set<String> get favoriteIds => _favoriteIds;
+  List<ProductModel> get favorites => _favorites;
+  int get favoriteCount => _favoriteIds.length;
 
-  // تحميل المفضلات
-  Future<void> loadFavorites() async {
-    _favoriteIds = await _favoritesService.getFavorites();
-    notifyListeners();
-  }
-
-  // التحقق لو المنتج مفضل
   bool isFavorite(String productId) {
     return _favoriteIds.contains(productId);
   }
 
-  // إضافة/إزالة من المفضلات
-  Future<void> toggleFavorite(String productId) async {
-    await _favoritesService.toggleFavorite(productId);
-    await loadFavorites();
+  void toggleFavorite(String productId) {
+    if (_favoriteIds.contains(productId)) {
+      _favoriteIds.remove(productId);
+      _favorites.removeWhere((product) => product.id == productId);
+    } else {
+      _favoriteIds.add(productId);
+      // Note: Product will be added via addFavoriteProduct method
+    }
+    notifyListeners();
   }
 
-  // مسح كل المفضلات
-  Future<void> clearFavorites() async {
-    await _favoritesService.clearFavorites();
-    _favoriteIds = [];
+  void addFavoriteProduct(ProductModel product) {
+    if (!_favoriteIds.contains(product.id)) {
+      _favoriteIds.add(product.id);
+      _favorites.add(product);
+      notifyListeners();
+    }
+  }
+
+  void removeFavoriteProduct(String productId) {
+    _favoriteIds.remove(productId);
+    _favorites.removeWhere((product) => product.id == productId);
+    notifyListeners();
+  }
+
+  void clearAll() {
+    _favoriteIds.clear();
+    _favorites.clear();
     notifyListeners();
   }
 }

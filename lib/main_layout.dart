@@ -5,6 +5,7 @@ import 'core/widgets/custom_app_bar.dart';
 import 'core/widgets/custom_bottom_nav_bar.dart';
 import 'core/widgets/custom_drawer.dart';
 import 'features/cart/views/pages/cart_screen.dart';
+import 'features/profile/views/pages/profile_screen.dart';
 import 'features/search/views/pages/search_screen.dart';
 
 class CartView extends StatelessWidget {
@@ -36,7 +37,7 @@ class _MainLayoutState extends State<MainLayout> {
     const CategoriesView(),
     const SearchScreen(),
     const CartScreen(),
-    const ProfileView(),
+    const ProfileScreen(),
   ];
 
   void _onTabTapped(int index) {
