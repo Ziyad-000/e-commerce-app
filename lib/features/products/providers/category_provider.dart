@@ -2,32 +2,33 @@ import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 import '../services/category_service.dart';
 
-class CategoryProvider extends ChangeNotifier {
-  final CategoryService _categoryService = CategoryService();
+class CategoryProvider with ChangeNotifier {
+  final CategoryService _service = CategoryService();
 
   List<CategoryModel> _categories = [];
   bool _isLoading = false;
-  String? _errorMessage;
 
-  // Getters
   List<CategoryModel> get categories => _categories;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
 
-  // جلب كل الفئات
-  Future<void> fetchCategories() async {
+  void listenToCategories() {
     _isLoading = true;
-    _errorMessage = null;
     notifyListeners();
 
-    try {
-      _categories = await _categoryService.getAllCategories();
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      _errorMessage = 'Failed to load categories';
-      notifyListeners();
-    }
+    _service.getCategories().listen(
+      (categories) {
+        _categories = categories;
+        _isLoading = false;
+        notifyListeners();
+      },
+      onError: (error) {
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<CategoryModel?> getCategoryById(String categoryId) {
+    return _service.getCategoryById(categoryId);
   }
 }

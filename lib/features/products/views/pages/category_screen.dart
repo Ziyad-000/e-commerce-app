@@ -17,8 +17,8 @@ class _CategoriesViewState extends State<CategoriesView> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<CategoryProvider>().fetchCategories();
-      context.read<ProductProvider>().fetchFeaturedProducts();
+      context.read<CategoryProvider>().listenToCategories();
+      context.read<ProductProvider>().listenToFeaturedProducts();
     });
   }
 
@@ -36,7 +36,7 @@ class _CategoriesViewState extends State<CategoriesView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Text(
+                const Text(
                   'Shop by Category',
                   style: TextStyle(
                     color: AppColors.foreground,
@@ -45,7 +45,7 @@ class _CategoriesViewState extends State<CategoriesView> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                const Text(
                   'Discover your style',
                   style: TextStyle(
                     color: AppColors.mutedForeground,
@@ -64,28 +64,6 @@ class _CategoriesViewState extends State<CategoriesView> {
                           child: CircularProgressIndicator(
                             color: AppColors.accent,
                           ),
-                        ),
-                      );
-                    }
-
-                    if (categoryProvider.errorMessage != null) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            Text(
-                              categoryProvider.errorMessage!,
-                              style: const TextStyle(
-                                color: AppColors.destructive,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                categoryProvider.fetchCategories();
-                              },
-                              child: const Text('Retry'),
-                            ),
-                          ],
                         ),
                       );
                     }
@@ -111,7 +89,7 @@ class _CategoriesViewState extends State<CategoriesView> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
-                            childAspectRatio: 0.9,
+                            childAspectRatio: 0.75,
                           ),
                       itemBuilder: (context, index) {
                         final category = categoryProvider.categories[index];
@@ -126,57 +104,80 @@ class _CategoriesViewState extends State<CategoriesView> {
                           },
                           child: Container(
                             decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(category.imageUrl),
-                                fit: BoxFit.cover,
-                              ),
                               borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.border),
                             ),
-                            child: Stack(
+                            child: Column(
                               children: [
-                                // Gradient overlay
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.transparent,
-                                        Colors.black.withOpacity(0.7),
-                                      ],
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(12),
+                                      topRight: Radius.circular(12),
                                     ),
+                                    child: category.imageUrl.isNotEmpty
+                                        ? Image.network(
+                                            category.imageUrl,
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                                  return Container(
+                                                    color: AppColors.surface2,
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons.category,
+                                                        size: 40,
+                                                        color: AppColors
+                                                            .mutedForeground,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                          )
+                                        : Container(
+                                            color: AppColors.surface2,
+                                            child: const Center(
+                                              child: Icon(
+                                                Icons.category,
+                                                size: 40,
+                                                color:
+                                                    AppColors.mutedForeground,
+                                              ),
+                                            ),
+                                          ),
                                   ),
                                 ),
-
-                                // Text
-                                Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          category.name,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${category.CategoryNumber} items',
-                                          style: const TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.surface2,
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(12),
+                                      bottomRight: Radius.circular(12),
                                     ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        category.name,
+                                        style: const TextStyle(
+                                          color: AppColors.foreground,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${category.productCount} items',
+                                        style: const TextStyle(
+                                          color: AppColors.mutedForeground,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -190,7 +191,7 @@ class _CategoriesViewState extends State<CategoriesView> {
 
                 const SizedBox(height: 32),
 
-                // Trending Now Section
+                // Trending Section
                 const Text(
                   'Trending Now',
                   style: TextStyle(
@@ -203,10 +204,9 @@ class _CategoriesViewState extends State<CategoriesView> {
 
                 Consumer<ProductProvider>(
                   builder: (context, productProvider, child) {
-                    final trendingProducts =
-                        productProvider.featuredProducts.isEmpty
-                        ? productProvider.allProducts.take(3).toList()
-                        : productProvider.featuredProducts.take(3).toList();
+                    final trendingProducts = productProvider.featuredProducts
+                        .take(3)
+                        .toList();
 
                     if (trendingProducts.isEmpty) {
                       return const SizedBox.shrink();
@@ -223,14 +223,14 @@ class _CategoriesViewState extends State<CategoriesView> {
                         const SizedBox(height: 12),
                         _buildTrendingItem(
                           'Athletic Wear',
-                          '23 items',
+                          'Featured items',
                           Colors.green,
                           () {},
                         ),
                         const SizedBox(height: 12),
                         _buildTrendingItem(
                           'Formal Wear',
-                          '12 items',
+                          'Best sellers',
                           Colors.orange,
                           () {},
                         ),
@@ -264,7 +264,6 @@ class _CategoriesViewState extends State<CategoriesView> {
         ),
         child: Row(
           children: [
-            // Color indicator
             Container(
               width: 4,
               height: 40,
@@ -274,8 +273,6 @@ class _CategoriesViewState extends State<CategoriesView> {
               ),
             ),
             const SizedBox(width: 16),
-
-            // Text
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,8 +296,6 @@ class _CategoriesViewState extends State<CategoriesView> {
                 ],
               ),
             ),
-
-            // Arrow
             const Icon(
               Icons.arrow_forward_ios,
               color: AppColors.mutedForeground,
