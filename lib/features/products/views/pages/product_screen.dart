@@ -1,7 +1,9 @@
 import 'package:ecommerce_app/core/theme/app_theme.dart';
-import 'package:ecommerce_app/core/widgets/product_card.dart';
+import 'package:ecommerce_app/features/products/views/widgets/product_card.dart';
 import 'package:ecommerce_app/features/products/models/product_model.dart';
+import 'package:ecommerce_app/features/products/providers/product_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProductScreen extends StatefulWidget {
   final String categoryName;
@@ -12,94 +14,78 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen> {
-  List<ProductModel> productsList = [
-    ProductModel(
-      id: '0',
-      name: 'Cotton T-shirt Regular Fit',
-      description: 'Made from Premium cotton blend for ultimate comfort',
-      imageUrl:
-          'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
-      price: 9.99,
-      rating: 4.6,
-      category: 'Shirts & Tops',
-    ),
-    ProductModel(
-      id: '1',
-      name: 'Cotton T-shirt Regular Fit',
-      description: 'Made from Premium cotton blend for ultimate comfort',
-      imageUrl:
-          'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
-      price: 29.99,
-      rating: 4.8,
-      category: 'Shirts & Tops',
-    ),
-    ProductModel(
-      id: '2',
-      name: 'Cotton T-shirt Regular Fit',
-      description: 'Made from Premium cotton blend for ultimate comfort',
-      imageUrl:
-          'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
-      price: 39.99,
-      rating: 4.5,
-      category: 'Shirts & Tops',
-    ),
-    ProductModel(
-      id: '3',
-      name: 'Cotton T-shirt Regular Fit',
-      description: 'Made from Premium cotton blend for ultimate comfort',
-      imageUrl:
-          'https://media.alshaya.com/adobe/assets/urn:aaid:aem:86ca5dfc-aa8a-4393-bbc2-a2faaa86ff53/as/EID-25c4e18f4568fa8617accca0a7a18c67fa969dce.jpg?preferwebp=true&width=1024&auto=webp ',
-      price: 49.99,
-      rating: 4.7,
-      category: 'Shirts & Tops',
-    ),
-  ];
   bool largeView = false;
   bool filterView = false;
   List<ProductModel> filteredProducts = [];
-  late final TextEditingController productSearch;
+  late final TextEditingController searchController;
 
   @override
   void initState() {
-    productSearch = TextEditingController();
-    filteredProducts = List.from(productsList);
     super.initState();
+    searchController = TextEditingController();
   }
 
-  void filteredProductsShown(String value) {
-    print(filteredProducts);
-    filteredProducts = productsList.where((product) {
-      final productName = product.name.toLowerCase();
-      return value.isEmpty || productName.contains(value.toLowerCase());
-    }).toList();
-    print(filteredProducts);
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void filterProducts(String query, List<ProductModel> allProducts) {
+    if (query.isEmpty) {
+      filteredProducts = List.from(allProducts);
+    } else {
+      filteredProducts = allProducts.where((product) {
+        final productName = product.name.toLowerCase();
+        return productName.contains(query.toLowerCase());
+      }).toList();
+    }
+  }
+
+  void sortByPrice(bool ascending) {
+    setState(() {
+      filteredProducts.sort((a, b) {
+        return ascending
+            ? a.price.compareTo(b.price)
+            : b.price.compareTo(a.price);
+      });
+    });
+  }
+
+  void sortByRating() {
+    setState(() {
+      filteredProducts.sort((a, b) => b.rating.compareTo(a.rating));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final productProvider = context.watch<ProductProvider>();
+
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
+              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Icons.arrow_back_ios_new),
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.arrow_back_ios_new),
                       ),
                       Text(
                         widget.categoryName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: AppColors.foreground,
                           fontSize: 20,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -127,145 +113,139 @@ class _ProductScreenState extends State<ProductScreen> {
                   ),
                 ],
               ),
-              TextField(
-                onChanged: (value) {
-                  setState(() {
-                    filteredProductsShown(value);
-                  });
-                },
-                onSubmitted: (value) => FocusScope.of(context).unfocus(),
-                controller: productSearch,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search, color: AppColors.secondary),
-                  hintText: widget.categoryName,
-                  hintStyle: TextStyle(color: AppColors.secondary),
+
+              // Search Bar
+              StreamBuilder<List<ProductModel>>(
+                stream: productProvider.getProductsByCategory(
+                  widget.categoryName,
                 ),
-              ),
-              const SizedBox(height: 10),
-              //filter bar,
-              (!filterView)
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            TextButton(
-                              onPressed:
-                                  // on favourite implement
-                                  () {},
-                              child: Text('Popular'),
-                              style: TextButton.styleFrom(
-                                backgroundColor: AppColors.surface2.withAlpha(
-                                  200,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                textStyle: theme.textTheme.labelLarge,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: AppConstants.paddingXXL,
-                                  vertical: AppConstants.paddingL,
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              child: TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    filteredProducts.sort((product1, product2) {
-                                      return product1.price.compareTo(
-                                        product2.price,
-                                      );
-                                    });
-                                  });
-                                },
-                                style: TextButton.styleFrom(
-                                  backgroundColor: AppColors.surface2.withAlpha(
-                                    200,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24),
-                                  ),
-                                  textStyle: theme.textTheme.labelLarge,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: AppConstants.paddingXXL,
-                                    vertical: AppConstants.paddingL,
-                                  ),
-                                ),
-                                child: Text('Price: Low to High'),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  filteredProducts.sort((product1, product2) {
-                                    return product2.price.compareTo(
-                                      product1.price,
-                                    );
-                                  });
-                                });
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor: AppColors.surface2.withAlpha(
-                                  200,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                textStyle: theme.textTheme.labelLarge,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: AppConstants.paddingXXL,
-                                  vertical: AppConstants.paddingL,
-                                ),
-                              ),
-                              child: Text('Price: High to Low'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  filteredProducts.sort((product1, product2) {
-                                    return product1.rating.compareTo(
-                                      product2.rating,
-                                    );
-                                  });
-                                });
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor: AppColors.surface2.withAlpha(
-                                  200,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                textStyle: theme.textTheme.labelLarge,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: AppConstants.paddingXXL,
-                                  vertical: AppConstants.paddingL,
-                                ),
-                              ),
-                              child: Text('Rating'),
-                            ),
-                          ],
-                        ),
+                builder: (context, snapshot) {
+                  final products = snapshot.data ?? [];
+
+                  return TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        filterProducts(value, products);
+                      });
+                    },
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: AppColors.mutedForeground,
                       ),
-                    )
-                  : const SizedBox(height: 5),
-              Expanded(
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: (largeView) ? 1 : 2,
-                    childAspectRatio: (largeView) ? 1 : 0.6,
+                      hintText: 'Search in ${widget.categoryName}',
+                      hintStyle: const TextStyle(
+                        color: AppColors.mutedForeground,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 10),
+
+              // Filter Bar
+              if (!filterView)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildFilterButton('Popular', () {}),
+                        _buildFilterButton('Price: Low to High', () {
+                          sortByPrice(true);
+                        }),
+                        _buildFilterButton('Price: High to Low', () {
+                          sortByPrice(false);
+                        }),
+                        _buildFilterButton('Rating', sortByRating),
+                      ],
+                    ),
                   ),
-                  itemCount: filteredProducts.length,
-                  itemBuilder: (context, index) {
-                    return ProductCard(product: filteredProducts[index]);
+                ),
+
+              // Products Grid
+              Expanded(
+                child: StreamBuilder<List<ProductModel>>(
+                  stream: productProvider.getProductsByCategory(
+                    widget.categoryName,
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.accent,
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          'Error loading products',
+                          style: const TextStyle(color: AppColors.destructive),
+                        ),
+                      );
+                    }
+
+                    final products = snapshot.data ?? [];
+
+                    if (products.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No products found',
+                          style: TextStyle(color: AppColors.mutedForeground),
+                        ),
+                      );
+                    }
+
+                    if (filteredProducts.isEmpty &&
+                        searchController.text.isEmpty) {
+                      filteredProducts = List.from(products);
+                    }
+
+                    final displayProducts = searchController.text.isEmpty
+                        ? products
+                        : filteredProducts;
+
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: largeView ? 1 : 2,
+                        childAspectRatio: largeView ? 1 : 0.7,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                      ),
+
+                      itemCount: displayProducts.length,
+                      itemBuilder: (context, index) {
+                        return ProductCard(product: displayProducts[index]);
+                      },
+                    );
                   },
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFilterButton(String label, VoidCallback onPressed) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          backgroundColor: AppColors.surface2.withAlpha(200),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        ),
+        child: Text(label),
       ),
     );
   }

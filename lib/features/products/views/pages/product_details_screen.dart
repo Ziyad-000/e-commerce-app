@@ -20,7 +20,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int? selectedColor;
   int quantity = 1;
 
-  final List<String> sizes = ['XS', 'S', 'M', 'L', 'XL'];
   final List<Color> colors = [Colors.black, Colors.white, Colors.grey];
 
   @override
@@ -30,6 +29,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final int discountPercentage = onSale
         ? widget.product.discount!.toInt()
         : 0;
+    final availableSizes = widget.product.sizes ?? ['XS', 'S', 'M', 'L', 'XL'];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -39,6 +39,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Product Image
                 Stack(
                   children: [
                     Image.network(
@@ -58,6 +59,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         );
                       },
                     ),
+
+                    // Back Button
                     Positioned(
                       top: 40,
                       left: 16,
@@ -72,6 +75,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                     ),
+
+                    // Favorite Button
                     Positioned(
                       top: 40,
                       right: 16,
@@ -105,11 +110,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                   ],
                 ),
+
+                // Product Info
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Title & Discount Badge
                       Row(
                         children: [
                           Expanded(
@@ -144,6 +152,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
+
+                      // Price
                       Row(
                         children: [
                           Text(
@@ -167,6 +177,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
+
+                      // Rating
                       Row(
                         children: [
                           const Icon(
@@ -194,6 +206,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
+
+                      // Description
                       Text(
                         widget.product.description.isNotEmpty
                             ? widget.product.description
@@ -205,6 +219,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
+
+                      // Size Selector
                       const Text(
                         'Size',
                         style: TextStyle(
@@ -214,40 +230,38 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      Row(
-                        children: sizes.map((size) {
+                      Wrap(
+                        spacing: 12,
+                        children: availableSizes.map((size) {
                           final isSelected = selectedSize == size;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 12),
-                            child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  selectedSize = size;
-                                });
-                              },
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedSize = size;
+                              });
+                            },
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.foreground
+                                    : AppColors.surface2,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
                                   color: isSelected
                                       ? AppColors.foreground
-                                      : AppColors.surface2,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? AppColors.foreground
-                                        : AppColors.border,
-                                  ),
+                                      : AppColors.border,
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    size,
-                                    style: TextStyle(
-                                      color: isSelected
-                                          ? AppColors.background
-                                          : AppColors.foreground,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  size,
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? AppColors.background
+                                        : AppColors.foreground,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -256,6 +270,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         }).toList(),
                       ),
                       const SizedBox(height: 24),
+
+                      // Color Selector
                       const Text(
                         'Color',
                         style: TextStyle(
@@ -295,6 +311,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         }),
                       ),
                       const SizedBox(height: 24),
+
+                      // Quantity Selector
                       const Text(
                         'Quantity',
                         style: TextStyle(
@@ -356,6 +374,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ],
             ),
           ),
+
+          // Bottom Buttons
           Positioned(
             bottom: 0,
             left: 0,
@@ -366,7 +386,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 color: AppColors.background,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: AppColors.border.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),

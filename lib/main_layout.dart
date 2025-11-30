@@ -8,20 +8,6 @@ import 'features/cart/views/pages/cart_screen.dart';
 import 'features/profile/views/pages/profile_screen.dart';
 import 'features/search/views/pages/search_screen.dart';
 
-class CartView extends StatelessWidget {
-  const CartView({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Cart Page')));
-}
-
-class ProfileView extends StatelessWidget {
-  const ProfileView({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('Profile Page')));
-}
-
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
 

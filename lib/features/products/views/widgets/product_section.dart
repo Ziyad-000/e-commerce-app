@@ -1,7 +1,7 @@
+import 'package:ecommerce_app/features/products/views/widgets/product_card.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/widgets/product_card.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../models/product_model.dart';
-import 'package:ecommerce_app/core/theme/app_theme.dart';
 
 class ProductSection extends StatelessWidget {
   final String title;
@@ -22,7 +22,7 @@ class ProductSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // العنوان مع See All
+          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -52,9 +52,9 @@ class ProductSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4),
 
-          // Grid المنتجات (2 columns)
+          // Products Grid
           if (products.isEmpty)
             const Center(
               child: Padding(
@@ -73,7 +73,7 @@ class ProductSection extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 0.65,
+                childAspectRatio: 0.7,
               ),
               itemCount: products.length > 6 ? 6 : products.length,
               itemBuilder: (context, index) {

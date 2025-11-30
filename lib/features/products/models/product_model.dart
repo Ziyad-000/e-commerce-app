@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ProductModel {
   final String id;
   final String name;
@@ -16,6 +18,7 @@ class ProductModel {
   final String category;
   final List<String>? sizes;
   final int? stock;
+  final DateTime? createdAt;
 
   ProductModel({
     required this.id,
@@ -35,6 +38,7 @@ class ProductModel {
     this.finalPrice,
     this.sizes,
     this.stock,
+    this.createdAt,
   });
 
   Map<String, dynamic> toMap() {
@@ -57,6 +61,9 @@ class ProductModel {
     if (finalPrice != null) result.addAll({'finalPrice': finalPrice});
     if (sizes != null) result.addAll({'sizes': sizes});
     if (stock != null) result.addAll({'stock': stock});
+    if (createdAt != null) {
+      result.addAll({'createdAt': Timestamp.fromDate(createdAt!)});
+    }
 
     return result;
   }
@@ -92,11 +99,17 @@ class ProductModel {
         }
       }
 
-      // ← Parse sizes
       List<String>? sizesList;
       if (map['sizes'] != null) {
         if (map['sizes'] is List) {
           sizesList = List<String>.from(map['sizes']);
+        }
+      }
+
+      DateTime? createdAtDate;
+      if (map['createdAt'] != null) {
+        if (map['createdAt'] is Timestamp) {
+          createdAtDate = (map['createdAt'] as Timestamp).toDate();
         }
       }
 
@@ -122,13 +135,13 @@ class ProductModel {
             : null,
         sizes: sizesList,
         stock: map['stock'] != null ? _toInt(map['stock']) : null,
+        createdAt: createdAtDate,
       );
     } catch (e) {
       rethrow;
     }
   }
 
-  // Helper methods
   static double _toDouble(dynamic value) {
     if (value == null) return 0.0;
     if (value is double) return value;

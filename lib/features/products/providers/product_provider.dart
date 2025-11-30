@@ -2,83 +2,74 @@ import 'package:flutter/material.dart';
 import '../models/product_model.dart';
 import '../services/products_service.dart';
 
-class ProductProvider extends ChangeNotifier {
-  final ProductsService _productsService = ProductsService();
+class ProductProvider with ChangeNotifier {
+  final ProductsService _service = ProductsService();
 
-  List<ProductModel> _allProducts = [];
+  List<ProductModel> _products = [];
   List<ProductModel> _featuredProducts = [];
-  List<ProductModel> _discountedProducts = [];
-  List<ProductModel> _categoryProducts = [];
-
   bool _isLoading = false;
   String? _errorMessage;
 
-  // Getters
-  List<ProductModel> get allProducts => _allProducts;
+  List<ProductModel> get allProducts => _products;
+  List<ProductModel> get products => _products;
   List<ProductModel> get featuredProducts => _featuredProducts;
-  List<ProductModel> get discountedProducts => _discountedProducts;
-  List<ProductModel> get categoryProducts => _categoryProducts;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  // جلب كل المنتجات
-  Future<void> fetchAllProducts() async {
+  List<ProductModel> get discountedProducts {
+    return _products
+        .where((p) => p.discount != null && p.discount! > 0)
+        .toList();
+  }
+
+  void listenToProducts() {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
-    try {
-      _allProducts = await _productsService.getAllProducts();
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      _errorMessage = 'Failed to load products';
-      notifyListeners();
-    }
+    _service.watchAllProducts().listen(
+      (products) {
+        _products = products;
+        _isLoading = false;
+        _errorMessage = null;
+        notifyListeners();
+      },
+      onError: (error) {
+        _isLoading = false;
+        _errorMessage = 'Failed to load products';
+        notifyListeners();
+      },
+    );
   }
 
-  // جلب المنتجات المميزة
-  Future<void> fetchFeaturedProducts() async {
-    try {
-      _featuredProducts = await _productsService.getFeaturedProducts();
+  void listenToFeaturedProducts() {
+    _service.watchFeaturedProducts().listen((products) {
+      _featuredProducts = products;
       notifyListeners();
-    } catch (e) {
-      debugPrint('Error fetching featured products: $e');
-    }
+    });
   }
 
-  // جلب منتجات بخصم
-  Future<void> fetchDiscountedProducts() async {
-    try {
-      _discountedProducts = await _productsService.getDiscountedProducts();
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error fetching discounted products: $e');
-    }
+  void fetchAllProducts() {
+    listenToProducts();
   }
 
-  // جلب منتجات حسب الفئة
-  Future<void> fetchProductsByCategory(String categoryName) async {
-    _isLoading = true;
-    _errorMessage = null;
+  void fetchFeaturedProducts() {
+    listenToFeaturedProducts();
+  }
+
+  void fetchDiscountedProducts() {
     notifyListeners();
-
-    try {
-      _categoryProducts = await _productsService.getProductsByCategory(
-        categoryName,
-      );
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      _errorMessage = 'Failed to load products';
-      notifyListeners();
-    }
   }
 
-  // بحث في المنتجات
-  Future<List<ProductModel>> searchProducts(String query) async {
-    return await _productsService.searchProducts(query);
+  Stream<List<ProductModel>> getProductsByCategory(String category) {
+    return _service.watchByCategory(category);
+  }
+
+  Future<ProductModel?> getProductById(String productId) {
+    return _service.getProductById(productId);
+  }
+
+  Stream<List<ProductModel>> searchProducts(String query) {
+    return _service.searchProducts(query);
   }
 }

@@ -2,6 +2,7 @@ import 'package:ecommerce_app/core/theme/app_theme.dart';
 import 'package:ecommerce_app/features/products/providers/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../providers/category_provider.dart';
 import '../widgets/product_section.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,17 +18,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // جلب المنتجات عند فتح الصفحة
-    Future.microtask(() async {
-      final provider = context.read<ProductProvider>();
-      await provider.fetchAllProducts();
-      await provider.fetchFeaturedProducts();
-      await provider.fetchDiscountedProducts();
-
-      // Debug فقط
-      debugPrint('🔥 Total products: ${provider.allProducts.length}');
-      debugPrint('🔥 Featured: ${provider.featuredProducts.length}');
-      debugPrint('🔥 Discounted: ${provider.discountedProducts.length}');
+    Future.microtask(() {
+      context.read<ProductProvider>().listenToProducts();
+      context.read<ProductProvider>().listenToFeaturedProducts();
+      context.read<CategoryProvider>().listenToCategories();
     });
   }
 
@@ -39,7 +33,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: theme.colorScheme.surface,
       body: Consumer<ProductProvider>(
         builder: (context, productProvider, child) {
-          // لو بيحمّل
+          // Loading State
           if (productProvider.isLoading &&
               productProvider.allProducts.isEmpty) {
             return const Center(
@@ -47,7 +41,7 @@ class _HomePageState extends State<HomePage> {
             );
           }
 
-          // لو فيه خطأ
+          // Error State
           if (productProvider.errorMessage != null &&
               productProvider.allProducts.isEmpty) {
             return Center(
@@ -76,110 +70,111 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Special Offers Banner
-                Container(
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.destructive,
-                    borderRadius: BorderRadius.circular(
-                      AppConstants.borderRadius,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Special Offers',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Text(
-                        'Up to 50% off on selected items',
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
-                      ),
-                      const SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppColors.destructive,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                        ),
-                        child: const Text('Shop Now'),
-                      ),
-                    ],
-                  ),
-                ),
+                // Special Offers Banner
+                _buildSpecialOffersBanner(),
 
-                // 2. Categories Tabs
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildCategoryTab('Men'),
-                        _buildCategoryTab('Women'),
-                        _buildCategoryTab('Kids'),
-                        _buildCategoryTab('New'),
-                        _buildCategoryTab('Sale'),
-                      ],
-                    ),
-                  ),
-                ),
+                const SizedBox(height: 16),
 
-                const SizedBox(height: 24),
+                // Category Tabs
+                _buildCategoryTabs(),
 
-                // 3. Recommended for you
+                const SizedBox(height: 16),
+
+                // Recommended Section
                 ProductSection(
                   title: 'Recommended for you',
                   products: productProvider.allProducts.take(6).toList(),
                   onSeeAll: () {},
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
-                // 4. On Sale
+                // On Sale Section
                 ProductSection(
                   title: 'On Sale',
                   products: productProvider.discountedProducts.take(6).toList(),
                   onSeeAll: () {},
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
-                // 5. Featured Products
+                // Featured Section
                 ProductSection(
                   title: 'Featured Products',
                   products: productProvider.featuredProducts.take(6).toList(),
                   onSeeAll: () {},
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSpecialOffersBanner() {
+    return Container(
+      margin: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.destructive,
+        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Special Offers',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.close, color: Colors.white, size: 20),
+              ),
+            ],
+          ),
+          const Text(
+            'Up to 50% off on selected items',
+            style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: AppColors.destructive,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text('Shop Now'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryTabs() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _buildCategoryTab('Men'),
+            _buildCategoryTab('Women'),
+            _buildCategoryTab('Kids'),
+            _buildCategoryTab('New'),
+            _buildCategoryTab('Sale'),
+          ],
+        ),
       ),
     );
   }
