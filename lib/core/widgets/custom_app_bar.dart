@@ -1,46 +1,60 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String titleText;
   final List<Widget>? actions;
   final Widget? leading;
+  final bool centerTitle;
+  final bool showBackButton;
 
   const CustomAppBar({
     super.key,
     required this.titleText,
     this.actions,
     this.leading,
+    this.centerTitle = false,
+    this.showBackButton = true,
   });
+
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
-    final appBarTheme = Theme.of(context).appBarTheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          titleText,
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+    return AppBar(
+      backgroundColor: AppColors.background,
+      elevation: 0,
+      centerTitle: centerTitle,
+      automaticallyImplyLeading: showBackButton,
+      leading:
+          leading ??
+          (showBackButton && Navigator.canPop(context)
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios,
+                    color: AppColors.foreground,
+                    size: 20,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                )
+              : null),
+      title: Text(
+        titleText,
+        style: const TextStyle(
+          color: AppColors.foreground,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Poppins',
         ),
-        leading: leading,
-        actions: actions,
-        actionsIconTheme: IconThemeData(
-          color: appBarTheme.foregroundColor?.withAlpha(150),
-          size: 24,
+      ),
+      actions: actions,
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1.0),
+        child: Container(
+          color: AppColors.border.withValues(alpha: 0.3),
+          height: 1.0,
         ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: Colors.white.withAlpha(50), height: 1.0),
-        ),
-        backgroundColor: appBarTheme.backgroundColor,
-        elevation: appBarTheme.elevation,
-        titleTextStyle: textTheme.titleLarge,
       ),
     );
   }
