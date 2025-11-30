@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../features/products/models/product_model.dart';
+import '../routes/app_routes.dart';
 import '../theme/app_theme.dart';
 
 class AddToCartBottomSheet extends StatelessWidget {
@@ -24,11 +26,14 @@ class AddToCartBottomSheet extends StatelessWidget {
     int? selectedColor,
     int quantity = 1,
   }) {
+    // Haptic feedback
+    HapticFeedback.mediumImpact();
+
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      barrierColor: Colors.black.withValues(alpha: 0.5), // ← زودت الشفافية
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
         return AddToCartBottomSheet(
@@ -56,41 +61,30 @@ class AddToCartBottomSheet extends StatelessWidget {
       color: Colors.transparent,
       child: Stack(
         children: [
-          // Blur Background (محسّن)
+          // Blur Background
           Positioned.fill(
             child: GestureDetector(
               onTap: () => Navigator.pop(context),
               child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 15,
-                  sigmaY: 15,
-                ), // ← زودت البلور
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.2), // ← overlay
-                ),
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(color: Colors.black.withValues(alpha: 0.2)),
               ),
             ),
           ),
 
-          // Content (أعلى من الأسفل)
+          // Content
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-                bottom: 60, // ← أعلى بكتير من الأسفل
-              ),
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 60),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(24), // ← Rounded أكتر
+                borderRadius: BorderRadius.circular(24),
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.surface.withValues(
-                        alpha: 0.98,
-                      ), // ← أقل شفافية
+                      color: AppColors.surface.withValues(alpha: 0.98),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                         color: AppColors.border.withValues(alpha: 0.5),
@@ -107,7 +101,7 @@ class AddToCartBottomSheet extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // علامة صح
+                        // Success Icon
                         Row(
                           children: [
                             Container(
@@ -130,19 +124,34 @@ class AddToCartBottomSheet extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Text(
-                              'Added to cart',
-                              style: TextStyle(
-                                color: AppColors.foreground,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Added to cart',
+                                    style: TextStyle(
+                                      color: AppColors.foreground,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (quantity > 1)
+                                    Text(
+                                      'Quantity: $quantity',
+                                      style: const TextStyle(
+                                        color: AppColors.mutedForeground,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 24),
 
-                        // معلومات المنتج
+                        // Product Info
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -151,7 +160,7 @@ class AddToCartBottomSheet extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              // صورة المنتج
+                              // Product Image
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Image.network(
@@ -175,7 +184,7 @@ class AddToCartBottomSheet extends StatelessWidget {
                               ),
                               const SizedBox(width: 16),
 
-                              // التفاصيل
+                              // Details
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,6 +198,15 @@ class AddToCartBottomSheet extends StatelessWidget {
                                       ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '\$${product.price.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        color: AppColors.destructive,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     const SizedBox(height: 8),
 
@@ -255,10 +273,10 @@ class AddToCartBottomSheet extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
 
-                        // الأزرار
+                        // Buttons
                         Row(
                           children: [
-                            // Continue
+                            // Continue Shopping
                             Expanded(
                               child: OutlinedButton(
                                 onPressed: () {
@@ -293,7 +311,10 @@ class AddToCartBottomSheet extends StatelessWidget {
                               child: ElevatedButton.icon(
                                 onPressed: () {
                                   Navigator.pop(context);
-                                  // Navigate to cart
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.cartRoute,
+                                  );
                                 },
                                 icon: const Icon(Icons.shopping_cart, size: 20),
                                 label: const Text(
