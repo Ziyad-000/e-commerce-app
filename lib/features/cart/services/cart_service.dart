@@ -1,43 +1,99 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import '../models/cart_item_model.dart';
 
 class CartService {
-  static const String _cartKey = 'shopping_cart';
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // حفظ الـ Cart
-  Future<void> saveCart(List<Map<String, dynamic>> cartItems) async {
+  String? get _userId => _auth.currentUser?.uid;
+
+  Stream<List<CartItemModel>> watchCartItems() {
+    if (_userId == null) {
+      return Stream.value([]);
+    }
+
+    return _firestore
+        .collection('cart')
+        .doc(_userId)
+        .collection('items')
+        .orderBy('addedAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs
+              .map((doc) => CartItemModel.fromMap(doc.data()))
+              .toList();
+        })
+        .handleError((error) {
+          debugPrint('Error watching cart items: $error');
+          return <CartItemModel>[];
+        });
+  }
+
+  Future<void> addToCart(CartItemModel item) async {
+    if (_userId == null) return;
+
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final String cartJson = jsonEncode(cartItems);
-      await prefs.setString(_cartKey, cartJson);
+      await _firestore
+          .collection('cart')
+          .doc(_userId)
+          .collection('items')
+          .doc(item.id)
+          .set(item.toMap());
     } catch (e) {
-      // Handle error
+      debugPrint('Error adding to cart: $e');
     }
   }
 
-  // جلب الـ Cart
-  Future<List<Map<String, dynamic>>> getCart() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? cartJson = prefs.getString(_cartKey);
+  Future<void> updateQuantity(String itemId, int quantity) async {
+    if (_userId == null) return;
 
-      if (cartJson != null) {
-        final List<dynamic> decoded = jsonDecode(cartJson);
-        return decoded.map((item) => item as Map<String, dynamic>).toList();
-      }
-      return [];
+    try {
+      await _firestore
+          .collection('cart')
+          .doc(_userId)
+          .collection('items')
+          .doc(itemId)
+          .update({'quantity': quantity});
     } catch (e) {
-      return [];
+      debugPrint('Error updating quantity: $e');
     }
   }
 
-  // مسح الـ Cart
+  Future<void> removeFromCart(String itemId) async {
+    if (_userId == null) return;
+
+    try {
+      await _firestore
+          .collection('cart')
+          .doc(_userId)
+          .collection('items')
+          .doc(itemId)
+          .delete();
+    } catch (e) {
+      debugPrint('Error removing from cart: $e');
+    }
+  }
+
   Future<void> clearCart() async {
+    if (_userId == null) return;
+
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_cartKey);
+      final batch = _firestore.batch();
+      final snapshot = await _firestore
+          .collection('cart')
+          .doc(_userId)
+          .collection('items')
+          .get();
+
+      for (var doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      await batch.commit();
     } catch (e) {
-      // Handle error
+      debugPrint('Error clearing cart: $e');
     }
   }
 }

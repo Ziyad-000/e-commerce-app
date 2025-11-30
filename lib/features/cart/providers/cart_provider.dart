@@ -6,17 +6,38 @@ import '../../products/models/product_model.dart';
 class CartProvider extends ChangeNotifier {
   final CartService _cartService = CartService();
   List<CartItemModel> _cartItems = [];
+  bool _isLoading = false;
 
   List<CartItemModel> get cartItems => _cartItems;
+  bool get isLoading => _isLoading;
 
   int get itemCount => _cartItems.fold(0, (sum, item) => sum + item.quantity);
 
   double get totalPrice =>
       _cartItems.fold(0, (sum, item) => sum + item.totalPrice);
 
-  // إضافة منتج للـ Cart
-  void addToCart(ProductModel product, {String? size, int? color}) {
-    // البحث عن المنتج في الـ Cart
+  void listenToCart() {
+    _isLoading = true;
+    notifyListeners();
+
+    _cartService.watchCartItems().listen(
+      (items) {
+        _cartItems = items;
+        _isLoading = false;
+        notifyListeners();
+      },
+      onError: (error) {
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> addToCart(
+    ProductModel product, {
+    String? size,
+    int? color,
+  }) async {
     final existingIndex = _cartItems.indexWhere(
       (item) =>
           item.product.id == product.id &&
@@ -25,69 +46,47 @@ class CartProvider extends ChangeNotifier {
     );
 
     if (existingIndex >= 0) {
-      // زيادة الكمية
-      _cartItems[existingIndex].quantity++;
-    } else {
-      // إضافة منتج جديد
-      _cartItems.add(
-        CartItemModel(
-          product: product,
-          quantity: 1,
-          selectedSize: size,
-          selectedColor: color,
-        ),
+      final existingItem = _cartItems[existingIndex];
+      await _cartService.updateQuantity(
+        existingItem.id,
+        existingItem.quantity + 1,
       );
-    }
-
-    _saveCart();
-    notifyListeners();
-  }
-
-  // زيادة الكمية
-  void increaseQuantity(int index) {
-    if (index >= 0 && index < _cartItems.length) {
-      _cartItems[index].quantity++;
-      _saveCart();
-      notifyListeners();
+    } else {
+      final newItem = CartItemModel(
+        id: '${product.id}_${size ?? 'nosize'}_${color ?? 'nocolor'}_${DateTime.now().millisecondsSinceEpoch}',
+        product: product,
+        quantity: 1,
+        selectedSize: size,
+        selectedColor: color,
+      );
+      await _cartService.addToCart(newItem);
     }
   }
 
-  // تقليل الكمية
-  void decreaseQuantity(int index) {
+  Future<void> increaseQuantity(int index) async {
     if (index >= 0 && index < _cartItems.length) {
-      if (_cartItems[index].quantity > 1) {
-        _cartItems[index].quantity--;
-        _saveCart();
-        notifyListeners();
+      final item = _cartItems[index];
+      await _cartService.updateQuantity(item.id, item.quantity + 1);
+    }
+  }
+
+  Future<void> decreaseQuantity(int index) async {
+    if (index >= 0 && index < _cartItems.length) {
+      final item = _cartItems[index];
+      if (item.quantity > 1) {
+        await _cartService.updateQuantity(item.id, item.quantity - 1);
       }
     }
   }
 
-  // حذف منتج
-  void removeFromCart(int index) {
+  Future<void> removeFromCart(int index) async {
     if (index >= 0 && index < _cartItems.length) {
-      _cartItems.removeAt(index);
-      _saveCart();
-      notifyListeners();
+      final item = _cartItems[index];
+      await _cartService.removeFromCart(item.id);
     }
   }
 
-  // مسح كل الـ Cart
-  void clearCart() {
-    _cartItems.clear();
-    _cartService.clearCart();
-    notifyListeners();
-  }
-
-  // حفظ الـ Cart
-  Future<void> _saveCart() async {
-    final cartData = _cartItems.map((item) => item.toMap()).toList();
-    await _cartService.saveCart(cartData);
-  }
-
-  // تحميل الـ Cart (من SharedPreferences)
-  Future<void> loadCart() async {
-    //  تحميل المنتجات من Firebase بناءً على IDs
-    notifyListeners();
+  Future<void> clearCart() async {
+    await _cartService.clearCart();
   }
 }
