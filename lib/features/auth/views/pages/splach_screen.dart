@@ -1,8 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,15 +18,19 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuth() async {
+    // Delay for splash effect
     await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
-    final authProvider = context.read<AuthProvider>();
+    // Check if user is authenticated
+    final user = FirebaseAuth.instance.currentUser;
 
-    if (authProvider.isAuthenticated) {
+    if (user != null) {
+      // User is logged in
       Navigator.pushReplacementNamed(context, AppRoutes.mainLayoutRoute);
     } else {
+      // User not logged in
       Navigator.pushReplacementNamed(context, AppRoutes.loginRoute);
     }
   }
@@ -40,18 +43,48 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.shopping_bag, size: 80, color: AppColors.destructive),
+            // Logo
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: AppColors.destructive.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.shopping_bag,
+                size: 60,
+                color: AppColors.destructive,
+              ),
+            ),
             const SizedBox(height: 24),
+
+            // App Name
             const Text(
-              'Fashion Store',
+              'StyleShop',
               style: TextStyle(
                 color: AppColors.foreground,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Your Fashion Destination',
+              style: TextStyle(
+                color: AppColors.mutedForeground,
+                fontSize: 14,
+                letterSpacing: 0.5,
               ),
             ),
             const SizedBox(height: 40),
-            const CircularProgressIndicator(color: AppColors.destructive),
+
+            // Loading Indicator
+            const CircularProgressIndicator(
+              color: AppColors.destructive,
+              strokeWidth: 3,
+            ),
           ],
         ),
       ),
