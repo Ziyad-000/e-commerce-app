@@ -1,43 +1,108 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import '../../products/models/product_model.dart';
 
 class FavoritesService {
-  static const String _favoritesKey = 'favorite_products';
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // جلب المفضلات
-  Future<List<String>> getFavorites() async {
+  String? get _userId => _auth.currentUser?.uid;
+
+  Stream<List<ProductModel>> watchFavorites() {
+    if (_userId == null) {
+      return Stream.value([]);
+    }
+
+    return _firestore
+        .collection('favorites')
+        .doc(_userId)
+        .collection('items')
+        .orderBy('addedAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final data = doc.data();
+            return ProductModel.fromMap(
+              data['product'] as Map<String, dynamic>,
+            );
+          }).toList();
+        })
+        .handleError((error) {
+          debugPrint('Error watching favorites: $error');
+          return <ProductModel>[];
+        });
+  }
+
+  Future<void> addToFavorites(ProductModel product) async {
+    if (_userId == null) return;
+
     try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getStringList(_favoritesKey) ?? [];
+      await _firestore
+          .collection('favorites')
+          .doc(_userId)
+          .collection('items')
+          .doc(product.id)
+          .set({
+            'product': product.toMap(),
+            'addedAt': FieldValue.serverTimestamp(),
+          });
     } catch (e) {
-      return [];
+      debugPrint('Error adding to favorites: $e');
     }
   }
 
-  // إضافة/إزالة من المفضلات
-  Future<void> toggleFavorite(String productId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      List<String> favorites = await getFavorites();
+  Future<void> removeFromFavorites(String productId) async {
+    if (_userId == null) return;
 
-      if (favorites.contains(productId)) {
-        favorites.remove(productId);
-      } else {
-        favorites.add(productId);
+    try {
+      await _firestore
+          .collection('favorites')
+          .doc(_userId)
+          .collection('items')
+          .doc(productId)
+          .delete();
+    } catch (e) {
+      debugPrint('Error removing from favorites: $e');
+    }
+  }
+
+  Future<void> clearAllFavorites() async {
+    if (_userId == null) return;
+
+    try {
+      final batch = _firestore.batch();
+      final snapshot = await _firestore
+          .collection('favorites')
+          .doc(_userId)
+          .collection('items')
+          .get();
+
+      for (var doc in snapshot.docs) {
+        batch.delete(doc.reference);
       }
 
-      await prefs.setStringList(_favoritesKey, favorites);
+      await batch.commit();
     } catch (e) {
-      // Handle error
+      debugPrint('Error clearing favorites: $e');
     }
   }
 
-  // مسح كل المفضلات
-  Future<void> clearFavorites() async {
+  Future<bool> isFavorite(String productId) async {
+    if (_userId == null) return false;
+
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_favoritesKey);
+      final doc = await _firestore
+          .collection('favorites')
+          .doc(_userId)
+          .collection('items')
+          .doc(productId)
+          .get();
+
+      return doc.exists;
     } catch (e) {
-      // Handle error
+      debugPrint('Error checking favorite: $e');
+      return false;
     }
   }
 }

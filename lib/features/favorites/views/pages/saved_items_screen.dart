@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../favorites/providers/favorites_provider.dart';
+import '../../providers/favorites_provider.dart';
 import '../../../products/models/product_model.dart';
 import '../../../products/views/pages/product_details_screen.dart';
 
-class SavedItemsScreen extends StatelessWidget {
+class SavedItemsScreen extends StatefulWidget {
   const SavedItemsScreen({super.key});
+
+  @override
+  State<SavedItemsScreen> createState() => _SavedItemsScreenState();
+}
+
+class _SavedItemsScreenState extends State<SavedItemsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<FavoritesProvider>().listenToFavorites();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +74,12 @@ class SavedItemsScreen extends StatelessWidget {
       ),
       body: Consumer<FavoritesProvider>(
         builder: (context, favProvider, child) {
+          if (favProvider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.accent),
+            );
+          }
+
           final favorites = favProvider.favorites;
 
           if (favorites.isEmpty) {
@@ -88,7 +107,7 @@ class SavedItemsScreen extends StatelessWidget {
           Container(
             width: 100,
             height: 100,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.surface2,
               shape: BoxShape.circle,
             ),
@@ -157,7 +176,6 @@ class SavedItemsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Column(
           children: [
-            // Product Image
             Stack(
               children: [
                 ClipRRect(
@@ -184,7 +202,6 @@ class SavedItemsScreen extends StatelessWidget {
                   ),
                 ),
 
-                // Sale Badge
                 if (onSale)
                   Positioned(
                     top: 12,
@@ -209,7 +226,6 @@ class SavedItemsScreen extends StatelessWidget {
                     ),
                   ),
 
-                // Out of Stock Badge
                 if (isOutOfStock)
                   Positioned(
                     bottom: 12,
@@ -233,7 +249,6 @@ class SavedItemsScreen extends StatelessWidget {
                     ),
                   ),
 
-                // Menu Button
                 Positioned(
                   top: 8,
                   right: 8,
@@ -274,9 +289,7 @@ class SavedItemsScreen extends StatelessWidget {
                             Text('Share'),
                           ],
                         ),
-                        onTap: () {
-                          // TODO: Share product
-                        },
+                        onTap: () {},
                       ),
                     ],
                   ),
@@ -284,13 +297,11 @@ class SavedItemsScreen extends StatelessWidget {
               ],
             ),
 
-            // Product Info
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Product Name
                   Text(
                     product.name,
                     style: const TextStyle(
@@ -303,7 +314,6 @@ class SavedItemsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Rating
                   Row(
                     children: [
                       const Icon(
@@ -332,7 +342,6 @@ class SavedItemsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Price
                   Row(
                     children: [
                       Text(
@@ -358,7 +367,6 @@ class SavedItemsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Size Options
                   if (product.sizes != null && product.sizes!.isNotEmpty) ...[
                     Wrap(
                       spacing: 6,
@@ -391,16 +399,11 @@ class SavedItemsScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                   ],
 
-                  // Add to Cart Button
                   Row(
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: isOutOfStock
-                              ? null
-                              : () {
-                                  // TODO: Add to cart
-                                },
+                          onPressed: isOutOfStock ? null : () {},
                           icon: Icon(
                             Icons.shopping_cart_outlined,
                             size: 18,
