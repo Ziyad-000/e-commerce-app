@@ -157,11 +157,7 @@ class ProfileScreen extends StatelessWidget {
                   title: 'Order History',
                   subtitle: 'Track and view your orders',
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Order History - Coming soon!'),
-                      ),
-                    );
+                    Navigator.pushNamed(context, AppRoutes.orderHistoryRoute);
                   },
                 ),
 
@@ -234,7 +230,7 @@ class ProfileScreen extends StatelessWidget {
                   },
                 ),
 
-                const SizedBox(height: 80), // Space for bottom nav
+                const SizedBox(height: 80),
               ],
             ),
           ),
