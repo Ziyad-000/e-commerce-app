@@ -13,7 +13,7 @@ import '../../features/profile/views/pages/help_support_screen.dart';
 import '../../features/profile/views/pages/order_history_screen.dart';
 import '../../features/favorites/views/pages/saved_items_screen.dart';
 import '../../features/address/views/pages/addresses_screen.dart';
-import '../../features/profile/views/pages/payment_methods_screen.dart';
+import '../../features/payment/views/pages/payment_methods_screen.dart';
 import '../../main_layout.dart';
 import 'app_routes.dart';
 
