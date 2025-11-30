@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/routes/app_routes.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../products/views/widgets/product_card.dart';
 import '../../providers/search_provider.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -18,6 +19,9 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     Future.microtask(() => context.read<SearchProvider>().loadRecentSearches());
+    _searchController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -33,9 +37,13 @@ class _SearchScreenState extends State<SearchScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Search Bar
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(
+                top: 16,
+                left: 16,
+                right: 16,
+                bottom: 8,
+              ),
               child: TextField(
                 controller: _searchController,
                 onChanged: (value) {
@@ -44,21 +52,28 @@ class _SearchScreenState extends State<SearchScreen> {
                   }
                 },
                 onSubmitted: (value) {
-                  context.read<SearchProvider>().searchProducts(value);
+                  if (value.trim().isNotEmpty) {
+                    context.read<SearchProvider>().searchProducts(value);
+                  }
                 },
                 style: const TextStyle(color: AppColors.foreground),
                 decoration: InputDecoration(
                   hintText: 'Search products...',
                   hintStyle: const TextStyle(color: AppColors.mutedForeground),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: AppColors.destructive,
+                  prefixIcon: const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: FaIcon(
+                      FontAwesomeIcons.magnifyingGlass,
+                      color: AppColors.destructive,
+                      size: 20,
+                    ),
                   ),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(
-                            Icons.clear,
+                          icon: const FaIcon(
+                            FontAwesomeIcons.circleXmark,
                             color: AppColors.mutedForeground,
+                            size: 20,
                           ),
                           onPressed: () {
                             _searchController.clear();
@@ -93,7 +108,6 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
 
-            // المحتوى
             Expanded(
               child: Consumer<SearchProvider>(
                 builder: (context, searchProvider, child) {
@@ -107,6 +121,12 @@ class _SearchScreenState extends State<SearchScreen> {
                     return _buildSearchResults(searchProvider);
                   }
 
+                  if (searchProvider.lastQuery.isNotEmpty &&
+                      searchProvider.searchResults.isEmpty &&
+                      !searchProvider.isSearching) {
+                    return _buildNoResults();
+                  }
+
                   return _buildSearchSuggestions(searchProvider);
                 },
               ),
@@ -118,84 +138,72 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchResults(SearchProvider searchProvider) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.65,
-      ),
-      itemCount: searchProvider.searchResults.length,
-      itemBuilder: (context, index) {
-        final product = searchProvider.searchResults[index];
-        return InkWell(
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              AppRoutes.productDetailsRoute,
-              arguments: product,
-            );
-          },
-          child: Card(
-            clipBehavior: Clip.antiAlias,
-            color: AppColors.surface,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.network(
-                  product.imageUrl,
-                  height: 120,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 120,
-                      color: AppColors.surface2,
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        color: AppColors.mutedForeground,
-                      ),
-                    );
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        product.name,
-                        style: const TextStyle(
-                          color: AppColors.foreground,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '\$${product.price.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          color: AppColors.accent,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            '${searchProvider.searchResults.length} results found',
+            style: const TextStyle(
+              color: AppColors.mutedForeground,
+              fontSize: 14,
             ),
           ),
-        );
-      },
+        ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.7,
+            ),
+            itemCount: searchProvider.searchResults.length,
+            itemBuilder: (context, index) {
+              return ProductCard(product: searchProvider.searchResults[index]);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNoResults() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FaIcon(
+            FontAwesomeIcons.magnifyingGlass,
+            size: 80,
+            color: AppColors.mutedForeground.withValues(alpha: 0.5),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'No results found',
+            style: TextStyle(
+              color: AppColors.foreground,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Try searching with different keywords',
+            style: TextStyle(color: AppColors.mutedForeground, fontSize: 14),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildSearchSuggestions(SearchProvider searchProvider) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 16, right: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -216,13 +224,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       searchProvider.clearAllSearches();
                     },
                     child: const Text(
-                      'Clear',
+                      'Clear All',
                       style: TextStyle(color: AppColors.mutedForeground),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -236,7 +243,10 @@ class _SearchScreenState extends State<SearchScreen> {
                       label: Text(search),
                       backgroundColor: AppColors.surface2,
                       labelStyle: const TextStyle(color: AppColors.foreground),
-                      deleteIcon: const Icon(Icons.close, size: 16),
+                      deleteIcon: const FaIcon(
+                        FontAwesomeIcons.xmark,
+                        size: 14,
+                      ),
                       onDeleted: () {
                         searchProvider.removeRecentSearch(search);
                       },
@@ -246,7 +256,6 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               const SizedBox(height: 24),
             ],
-
             const Text(
               'Suggestions',
               style: TextStyle(
@@ -256,10 +265,10 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            _buildSuggestionItem('Popular items', Icons.trending_up),
-            _buildSuggestionItem('New arrivals', Icons.new_releases),
-            _buildSuggestionItem('Sale items', Icons.local_offer),
-            _buildSuggestionItem('Trending now', Icons.whatshot),
+            _buildSuggestionItem('T-Shirt', FontAwesomeIcons.shirt),
+            _buildSuggestionItem('Shoes', FontAwesomeIcons.shoePrints),
+            _buildSuggestionItem('Jacket', FontAwesomeIcons.vest),
+            _buildSuggestionItem('Dress', FontAwesomeIcons.personDress),
           ],
         ),
       ),
@@ -268,15 +277,17 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildSuggestionItem(String title, IconData icon) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.foreground),
+      contentPadding: EdgeInsets.zero,
+      leading: FaIcon(icon, color: AppColors.foreground, size: 20),
       title: Text(title, style: const TextStyle(color: AppColors.foreground)),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        size: 16,
+      trailing: const FaIcon(
+        FontAwesomeIcons.chevronRight,
+        size: 14,
         color: AppColors.mutedForeground,
       ),
       onTap: () {
-        debugPrint('Tapped: $title');
+        _searchController.text = title;
+        context.read<SearchProvider>().searchProducts(title);
       },
     );
   }
