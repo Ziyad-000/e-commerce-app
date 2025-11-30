@@ -1,7 +1,9 @@
 import 'package:ecommerce_app/features/address/models/address_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/auth_guard.dart';
 import '../../providers/address_provider.dart';
 import '../widgets/add_address_dialog.dart';
 import '../widgets/delete_address_dialog.dart';
@@ -18,6 +20,16 @@ class _AddressesScreenState extends State<AddressesScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Check Auth
+    if (!AuthGuard.isAuthenticated()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacementNamed(context, AppRoutes.loginRoute);
+      });
+      return;
+    }
+
+    // Listen to addresses
     Future.microtask(() {
       context.read<AddressProvider>().listenToAddresses();
     });

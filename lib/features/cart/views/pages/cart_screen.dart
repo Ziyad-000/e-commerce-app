@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/auth_guard.dart';
 import '../../providers/cart_provider.dart';
 
 class CartScreen extends StatefulWidget {
@@ -15,6 +16,16 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Check Auth
+    if (!AuthGuard.isAuthenticated()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacementNamed(context, AppRoutes.loginRoute);
+      });
+      return;
+    }
+
+    // Listen to cart
     Future.microtask(() {
       context.read<CartProvider>().listenToCart();
     });

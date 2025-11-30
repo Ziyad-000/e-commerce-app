@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/auth_guard.dart';
 import '../../providers/favorites_provider.dart';
 import '../../../products/models/product_model.dart';
 import '../../../products/views/pages/product_details_screen.dart';
@@ -16,6 +18,16 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Check Auth
+    if (!AuthGuard.isAuthenticated()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacementNamed(context, AppRoutes.loginRoute);
+      });
+      return;
+    }
+
+    // Listen to favorites
     Future.microtask(() {
       context.read<FavoritesProvider>().listenToFavorites();
     });
