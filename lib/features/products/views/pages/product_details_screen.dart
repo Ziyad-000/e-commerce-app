@@ -5,6 +5,8 @@ import '../../../../core/widgets/add_to_cart_bottom_sheet.dart';
 import '../../../cart/providers/cart_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../models/product_model.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductModel product;
@@ -24,6 +26,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Uint8List imageBytes = base64Decode(widget.product.imageUrl);
     final bool onSale =
         widget.product.discount != null && widget.product.discount! > 0;
     final int discountPercentage = onSale
@@ -42,8 +45,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 // Product Image
                 Stack(
                   children: [
-                    Image.network(
-                      widget.product.imageUrl,
+                    Image.memory(
+                      imageBytes,
                       width: double.infinity,
                       height: 400,
                       fit: BoxFit.cover,

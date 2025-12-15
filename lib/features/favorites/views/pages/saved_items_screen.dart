@@ -6,6 +6,8 @@ import '../../../../core/utils/auth_guard.dart';
 import '../../providers/favorites_provider.dart';
 import '../../../products/models/product_model.dart';
 import '../../../products/views/pages/product_details_screen.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
 class SavedItemsScreen extends StatefulWidget {
   const SavedItemsScreen({super.key});
@@ -168,7 +170,7 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
     final bool onSale = product.discount != null && product.discount! > 0;
     final int discountPercentage = onSale ? product.discount!.toInt() : 0;
     final bool isOutOfStock = product.stock != null && product.stock! <= 0;
-
+    Uint8List imageBytes = base64Decode(product.imageUrl);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -185,9 +187,11 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
             ),
           );
         },
+
         borderRadius: BorderRadius.circular(12),
         child: Column(
           children: [
+
             Stack(
               children: [
                 ClipRRect(
@@ -195,23 +199,23 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
                     topLeft: Radius.circular(12),
                     topRight: Radius.circular(12),
                   ),
-                  child: Image.network(
-                    product.imageUrl,
-                    width: double.infinity,
-                    height: 220,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 220,
-                        color: AppColors.surface2,
-                        child: const Icon(
-                          Icons.image_not_supported,
-                          size: 60,
-                          color: AppColors.mutedForeground,
-                        ),
-                      );
-                    },
-                  ),
+                  child: Image.memory(
+                  imageBytes,
+                  width: double.infinity,
+                  height: 220,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 220,
+                      color: AppColors.surface2,
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        size: 60,
+                        color: AppColors.mutedForeground,
+                      ),
+                    );
+                  },
+                ),
                 ),
 
                 if (onSale)
