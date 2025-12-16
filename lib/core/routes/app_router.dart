@@ -14,6 +14,9 @@ import '../../features/orders/views/pages/order_history_screen.dart';
 import '../../features/favorites/views/pages/saved_items_screen.dart';
 import '../../features/address/views/pages/addresses_screen.dart';
 import '../../features/payment/views/pages/payment_methods_screen.dart';
+import '../../features/cart/views/pages/checkout_screen.dart';
+import '../../features/orders/views/pages/order_confirmation_screen.dart';
+import '../../features/orders/views/pages/order_details_screen.dart';
 import '../../main_layout.dart';
 import 'app_routes.dart';
 
@@ -74,6 +77,25 @@ class AppRouter {
 
       case AppRoutes.helpSupportRoute:
         return MaterialPageRoute(builder: (_) => const HelpSupportScreen());
+
+      case AppRoutes.checkoutRoute:
+        return MaterialPageRoute(builder: (_) => const CheckoutScreen());
+
+      case AppRoutes.orderConfirmationRoute:
+        return MaterialPageRoute(
+          builder: (context) {
+            final orderId = settings.arguments as String? ?? '';
+            return OrderConfirmationScreen(orderId: orderId);
+          },
+        );
+
+      case AppRoutes.orderDetailsRoute:
+        return MaterialPageRoute(
+          builder: (context) {
+            final orderId = settings.arguments as String? ?? '';
+            return OrderDetailsScreen(orderId: orderId);
+          },
+        );
 
       default:
         return MaterialPageRoute(

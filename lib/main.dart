@@ -6,6 +6,7 @@ import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'features/address/providers/address_provider.dart';
 import 'features/cart/providers/cart_provider.dart';
+import 'features/cart/providers/checkout_provider.dart';
 import 'features/favorites/providers/favorites_provider.dart';
 import 'features/orders/providers/orders_provider.dart';
 import 'features/payment/providers/payment_provider.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => OrdersProvider()),
         ChangeNotifierProvider(create: (_) => AddressProvider()),

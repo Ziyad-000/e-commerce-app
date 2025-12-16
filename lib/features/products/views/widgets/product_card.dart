@@ -1,6 +1,5 @@
 import 'package:ecommerce_app/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../favorites/providers/favorites_provider.dart';
@@ -144,13 +143,13 @@ class ProductCard extends StatelessWidget {
                     // Rating
                     Row(
                       children: [
-                        RatingBarIndicator(
-                          rating: product.rating,
-                          itemBuilder: (context, index) =>
-                              const Icon(Icons.star, color: AppColors.warning),
-                          itemCount: 5,
-                          itemSize: 12.0,
-                        ),
+                        // RatingBarIndicator(
+                        //   rating: product.rating,
+                        //   itemBuilder: (context, index) =>
+                        //       const Icon(Icons.star, color: AppColors.warning),
+                        //   itemCount: 5,
+                        //   itemSize: 12.0,
+                        // ),
                         const SizedBox(width: 4),
                         Text(
                           product.rating.toStringAsFixed(1),

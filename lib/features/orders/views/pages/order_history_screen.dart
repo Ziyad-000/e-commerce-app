@@ -31,6 +31,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
     // Listen to orders
     Future.microtask(() {
+      if (!mounted) return;
       context.read<OrdersProvider>().listenToOrders();
     });
   }
@@ -441,10 +442,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('View Details - Coming soon!'),
-                      ),
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.orderDetailsRoute,
+                      arguments: order.orderId,
                     );
                   },
                   style: ElevatedButton.styleFrom(

@@ -149,7 +149,7 @@ class OrdersService {
     }
   }
 
-  /// Delete order (for testing only - should not be used in production)
+  /// Delete order
   Future<void> deleteOrder(String orderId) async {
     if (_userId == null) throw Exception('User not authenticated');
 

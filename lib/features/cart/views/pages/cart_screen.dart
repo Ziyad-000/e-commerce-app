@@ -4,6 +4,7 @@ import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/auth_guard.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/checkout_provider.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -496,7 +497,16 @@ class _CartScreenState extends State<CartScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Initialize checkout with cart data
+                      context.read<CheckoutProvider>().initializeCheckout(
+                        cartProvider.cartItems,
+                        subtotal,
+                      );
+
+                      // Navigate to checkout
+                      Navigator.pushNamed(context, AppRoutes.checkoutRoute);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.destructive,
                       foregroundColor: Colors.white,

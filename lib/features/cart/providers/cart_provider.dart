@@ -86,6 +86,18 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
+  // Move item to favorites and remove from cart
+  Future<void> moveToFavorites(
+    int index,
+    Function(ProductModel) addToFavorites,
+  ) async {
+    if (index >= 0 && index < _cartItems.length) {
+      final item = _cartItems[index];
+      await addToFavorites(item.product);
+      await removeFromCart(index);
+    }
+  }
+
   Future<void> clearCart() async {
     await _cartService.clearCart();
   }
