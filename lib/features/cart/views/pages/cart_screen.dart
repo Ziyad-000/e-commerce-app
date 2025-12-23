@@ -25,11 +25,7 @@ class _CartScreenState extends State<CartScreen> {
       });
       return;
     }
-
-    // Listen to cart
-    Future.microtask(() {
-      context.read<CartProvider>().listenToCart();
-    });
+    // Cart now loads from local storage automatically via main.dart
   }
 
   @override

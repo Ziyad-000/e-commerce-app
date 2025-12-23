@@ -17,7 +17,7 @@ class AddressService {
     return _firestore
         .collection('addresses')
         .doc(_userId)
-        .collection('items')
+        .collection('user_addresses')
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
@@ -42,7 +42,7 @@ class AddressService {
       await _firestore
           .collection('addresses')
           .doc(_userId)
-          .collection('items')
+          .collection('user_addresses')
           .doc(address.id)
           .set(address.toMap());
     } catch (e) {
@@ -62,7 +62,7 @@ class AddressService {
       await _firestore
           .collection('addresses')
           .doc(_userId)
-          .collection('items')
+          .collection('user_addresses')
           .doc(address.id)
           .update(address.toMap());
     } catch (e) {
@@ -78,7 +78,7 @@ class AddressService {
       await _firestore
           .collection('addresses')
           .doc(_userId)
-          .collection('items')
+          .collection('user_addresses')
           .doc(addressId)
           .delete();
     } catch (e) {
@@ -96,7 +96,7 @@ class AddressService {
       await _firestore
           .collection('addresses')
           .doc(_userId)
-          .collection('items')
+          .collection('user_addresses')
           .doc(addressId)
           .update({'isDefault': true});
     } catch (e) {
@@ -112,7 +112,7 @@ class AddressService {
       final snapshot = await _firestore
           .collection('addresses')
           .doc(_userId)
-          .collection('items')
+          .collection('user_addresses')
           .where('isDefault', isEqualTo: true)
           .get();
 

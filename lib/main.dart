@@ -12,7 +12,6 @@ import 'features/orders/providers/orders_provider.dart';
 import 'features/payment/providers/payment_provider.dart';
 import 'features/products/providers/product_provider.dart';
 import 'features/products/providers/category_provider.dart';
-
 import 'features/search/providers/search_provider.dart';
 import 'firebase_options.dart';
 
@@ -33,7 +32,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final cartProvider = CartProvider();
+            cartProvider.loadCachedCart(); // Load cart from local storage
+            return cartProvider;
+          },
+        ),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => OrdersProvider()),

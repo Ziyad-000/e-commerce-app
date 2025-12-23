@@ -52,50 +52,56 @@ class CheckoutAddressStep extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: const BoxDecoration(
-              color: AppColors.surface2,
-              shape: BoxShape.circle,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: const BoxDecoration(
+                color: AppColors.surface2,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.location_on_outlined,
+                size: 50,
+                color: AppColors.mutedForeground,
+              ),
             ),
-            child: const Icon(
-              Icons.location_on_outlined,
-              size: 50,
-              color: AppColors.mutedForeground,
+            const SizedBox(height: 24),
+            const Text(
+              'No Delivery Address',
+              style: TextStyle(
+                color: AppColors.foreground,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'No Delivery Address',
-            style: TextStyle(
-              color: AppColors.foreground,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            const SizedBox(height: 8),
+            const Text(
+              'Please add a delivery address to continue',
+              style: TextStyle(color: AppColors.mutedForeground, fontSize: 14),
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Please add a delivery address to continue',
-            style: TextStyle(color: AppColors.mutedForeground, fontSize: 14),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              AddAddressDialog.show(context);
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Add Address'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.destructive,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                AddAddressDialog.show(context);
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Add Address'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.destructive,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

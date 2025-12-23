@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/checkout_provider.dart';
+import '../../../address/providers/address_provider.dart';
+import '../../../payment/providers/payment_provider.dart';
 import '../widgets/checkout_address_step.dart';
 import '../widgets/checkout_payment_step.dart';
 import '../widgets/checkout_review_step.dart';
@@ -27,6 +29,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       });
       return;
     }
+
+    // Initialize providers to load data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AddressProvider>().listenToAddresses();
+      context.read<PaymentProvider>().listenToCards();
+    });
   }
 
   @override
