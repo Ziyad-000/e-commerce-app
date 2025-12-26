@@ -49,8 +49,7 @@ class CustomDrawer extends StatelessWidget {
                   title: Text('Orders History', style: textTheme.bodyLarge),
                   onTap: () {
                     Navigator.pop(context);
-                    // TODO: Navigate to orders when ready
-                    // Navigator.pushNamed(context, AppRoutes.ordersRoute);
+                    Navigator.pushNamed(context, AppRoutes.orderHistoryRoute);
                   },
                 ),
                 ListTile(
@@ -86,8 +85,7 @@ class CustomDrawer extends StatelessWidget {
                   title: Text('Payment Methods', style: textTheme.bodyLarge),
                   onTap: () {
                     Navigator.pop(context);
-                    // TODO: Navigate to payment when ready
-                    // Navigator.pushNamed(context, AppRoutes.paymentMethodsRoute);
+                    Navigator.pushNamed(context, AppRoutes.paymentMethodsRoute);
                   },
                 ),
                 const Divider(thickness: 0.5, color: AppColors.mutedForeground),

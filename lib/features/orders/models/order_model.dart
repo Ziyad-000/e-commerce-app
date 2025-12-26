@@ -78,9 +78,10 @@ class OrderModel {
   });
 
   // Getters
-  double get subtotal => items.fold(0, (sum, item) => sum + item.totalPrice);
+  double get subtotal =>
+      items.fold(0, (total, item) => total + item.totalPrice);
   double get grandTotal => subtotal + shippingFee;
-  int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
+  int get itemCount => items.fold(0, (total, item) => total + item.quantity);
 
   String get statusLabel {
     switch (status) {

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import '../../cart/models/cart_item_model.dart';
 import '../models/order_model.dart';
 
@@ -145,8 +146,10 @@ class OrderPlacementService {
       }
       await batch.commit();
     } catch (e) {
-      // Log error but don't fail the order
-      print('Warning: Failed to clear cart: $e');
+      if (kDebugMode) {
+        // Log error but don't fail the order
+        debugPrint('Warning: Failed to clear cart: $e');
+      }
     }
   }
 

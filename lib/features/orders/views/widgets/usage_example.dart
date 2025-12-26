@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/order_placement_service.dart';
-import '../../providers/orders_provider.dart';
 import '../../../cart/providers/cart_provider.dart';
 import '../../../cart/providers/checkout_provider.dart';
 import 'order_status_live_view.dart';
@@ -20,12 +19,15 @@ class _CheckoutExampleState extends State<CheckoutExample> {
   final OrderPlacementService _orderService = OrderPlacementService();
   bool _isPlacingOrder = false;
 
-  Future<void> _handlePlaceOrder(BuildContext context) async {
+  Future<void> _handlePlaceOrder() async {
     setState(() {
       _isPlacingOrder = true;
     });
 
     try {
+      // Capture context before any async gaps if it's needed after them
+      // However, in a StatefulWidget's State, `context` is always available
+      // and `mounted` check handles its validity.
       final cartProvider = context.read<CartProvider>();
       final checkoutProvider = context.read<CheckoutProvider>();
 
@@ -130,9 +132,7 @@ class _CheckoutExampleState extends State<CheckoutExample> {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _isPlacingOrder
-                    ? null
-                    : () => _handlePlaceOrder(context),
+                onPressed: _isPlacingOrder ? null : () => _handlePlaceOrder(),
                 child: _isPlacingOrder
                     ? const SizedBox(
                         height: 20,

@@ -1,23 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class FirebaseSeeder {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static Future<void> seedDatabase() async {
     try {
-      print('🌱 Starting database seeding...');
+      if (kDebugMode) {
+        debugPrint('🌱 Starting database seeding...');
+      }
 
       await seedCategories();
       await seedProducts();
 
-      print('✅ Database seeded successfully!');
+      if (kDebugMode) {
+        debugPrint('✅ Database seeded successfully!');
+      }
     } catch (e) {
-      print('❌ Error seeding database: $e');
+      if (kDebugMode) {
+        debugPrint('❌ Error seeding database: $e');
+      }
     }
   }
 
   static Future<void> seedCategories() async {
-    print('📂 Seeding categories...');
+    if (kDebugMode) {
+      debugPrint('📂 Seeding categories...');
+    }
 
     final categories = [
       {
@@ -63,17 +72,25 @@ class FirebaseSeeder {
 
       if (!docSnapshot.exists) {
         await docRef.set(category);
-        print('  ✓ Added category: ${category['name']}');
+        if (kDebugMode) {
+          debugPrint('  ✓ Added category: ${category['name']}');
+        }
       } else {
-        print('  - Category already exists: ${category['name']}');
+        if (kDebugMode) {
+          debugPrint('  - Category already exists: ${category['name']}');
+        }
       }
     }
 
-    print('✅ Categories seeding completed');
+    if (kDebugMode) {
+      debugPrint('✅ Categories seeding completed');
+    }
   }
 
   static Future<void> seedProducts() async {
-    print('📦 Seeding products...');
+    if (kDebugMode) {
+      debugPrint('📦 Seeding products...');
+    }
 
     final products = [
       {
@@ -231,23 +248,33 @@ class FirebaseSeeder {
 
       if (!docSnapshot.exists) {
         await docRef.set(product);
-        print('  ✓ Added product: ${product['name']}');
+        if (kDebugMode) {
+          debugPrint('  ✓ Added product: ${product['name']}');
+        }
       } else {
-        print('  - Product already exists: ${product['name']}');
+        if (kDebugMode) {
+          debugPrint('  - Product already exists: ${product['name']}');
+        }
       }
     }
 
-    print('✅ Products seeding completed');
+    if (kDebugMode) {
+      debugPrint('✅ Products seeding completed');
+    }
   }
 
   static Future<void> clearDatabase() async {
-    print('🗑️ Clearing database...');
+    if (kDebugMode) {
+      debugPrint('🗑️ Clearing database...');
+    }
 
     try {
       final productsSnapshot = await _firestore.collection('products').get();
       for (var doc in productsSnapshot.docs) {
         await doc.reference.delete();
-        print('  ✓ Deleted product: ${doc.id}');
+        if (kDebugMode) {
+          debugPrint('  ✓ Deleted product: ${doc.id}');
+        }
       }
 
       final categoriesSnapshot = await _firestore
@@ -255,12 +282,18 @@ class FirebaseSeeder {
           .get();
       for (var doc in categoriesSnapshot.docs) {
         await doc.reference.delete();
-        print('  ✓ Deleted category: ${doc.id}');
+        if (kDebugMode) {
+          debugPrint('  ✓ Deleted category: ${doc.id}');
+        }
       }
 
-      print('✅ Database cleared successfully');
+      if (kDebugMode) {
+        debugPrint('✅ Database cleared successfully');
+      }
     } catch (e) {
-      print('❌ Error clearing database: $e');
+      if (kDebugMode) {
+        debugPrint('❌ Error clearing database: $e');
+      }
     }
   }
 }

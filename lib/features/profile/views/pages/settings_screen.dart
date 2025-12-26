@@ -83,7 +83,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'Language',
               subtitle: 'English',
               onTap: () {
-                // TODO: Navigate to language selection
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Language selection coming soon!'),
+                  ),
+                );
               },
             ),
 
@@ -107,7 +111,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'Privacy Settings',
               subtitle: 'Manage your privacy preferences',
               onTap: () {
-                // TODO: Navigate to privacy settings
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Privacy settings coming soon!'),
+                  ),
+                );
               },
             ),
 
@@ -184,7 +192,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.destructive,
+            activeThumbColor: AppColors.destructive,
             activeTrackColor: AppColors.destructive.withValues(alpha: 0.5),
             inactiveThumbColor: Colors.grey,
             inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),

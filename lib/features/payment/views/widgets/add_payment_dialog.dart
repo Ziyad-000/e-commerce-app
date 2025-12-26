@@ -234,7 +234,6 @@ class _AddPaymentDialogContentState extends State<_AddPaymentDialogContent> {
                                         value.length < 5) {
                                       return 'Invalid';
                                     }
-                                    final parts = value.split('/');
                                     if (!CardUtils.isValidExpiryDate(value)) {
                                       return 'Expired';
                                     }

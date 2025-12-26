@@ -18,7 +18,10 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => context.read<SearchProvider>().loadRecentSearches());
+    Future.microtask(() {
+      if (!mounted) return;
+      context.read<SearchProvider>().loadRecentSearches();
+    });
     _searchController.addListener(() {
       setState(() {});
     });

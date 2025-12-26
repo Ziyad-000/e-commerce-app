@@ -196,7 +196,7 @@ class OrdersService {
       return orders
           .where((o) => o.status != OrderStatus.cancelled)
           .map((o) => o.grandTotal)
-          .fold<double>(0.0, (sum, amount) => sum + amount);
+          .fold<double>(0.0, (previousValue, amount) => previousValue + amount);
     } catch (e) {
       throw Exception('Failed to get total spent: $e');
     }

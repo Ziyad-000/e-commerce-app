@@ -31,6 +31,7 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
 
     // Listen to favorites
     Future.microtask(() {
+      if (!mounted) return;
       context.read<FavoritesProvider>().listenToFavorites();
     });
   }
@@ -191,7 +192,6 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
         borderRadius: BorderRadius.circular(12),
         child: Column(
           children: [
-
             Stack(
               children: [
                 ClipRRect(
@@ -200,22 +200,22 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
                     topRight: Radius.circular(12),
                   ),
                   child: Image.memory(
-                  imageBytes,
-                  width: double.infinity,
-                  height: 220,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 220,
-                      color: AppColors.surface2,
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        size: 60,
-                        color: AppColors.mutedForeground,
-                      ),
-                    );
-                  },
-                ),
+                    imageBytes,
+                    width: double.infinity,
+                    height: 220,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 220,
+                        color: AppColors.surface2,
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          size: 60,
+                          color: AppColors.mutedForeground,
+                        ),
+                      );
+                    },
+                  ),
                 ),
 
                 if (onSale)

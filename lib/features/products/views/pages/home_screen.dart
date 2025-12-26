@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/category_provider.dart';
 import '../widgets/product_section.dart';
-import 'dart:convert';
-import 'dart:typed_data';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,9 +19,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<ProductProvider>().listenToProducts();
-      context.read<ProductProvider>().listenToFeaturedProducts();
-      context.read<CategoryProvider>().listenToCategories();
+      if (mounted) {
+        context.read<ProductProvider>().listenToProducts();
+        context.read<ProductProvider>().listenToFeaturedProducts();
+        context.read<CategoryProvider>().listenToCategories();
+      }
     });
   }
 

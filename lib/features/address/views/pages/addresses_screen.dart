@@ -31,7 +31,9 @@ class _AddressesScreenState extends State<AddressesScreen> {
 
     // Listen to addresses
     Future.microtask(() {
-      context.read<AddressProvider>().listenToAddresses();
+      if (mounted) {
+        context.read<AddressProvider>().listenToAddresses();
+      }
     });
   }
 
@@ -205,7 +207,9 @@ class _AddressesScreenState extends State<AddressesScreen> {
                     ),
                     onTap: () {
                       Future.delayed(Duration.zero, () {
-                        EditAddressDialog.show(context, address);
+                        if (context.mounted) {
+                          EditAddressDialog.show(context, address);
+                        }
                       });
                     },
                   ),
@@ -239,12 +243,14 @@ class _AddressesScreenState extends State<AddressesScreen> {
                     ),
                     onTap: () {
                       Future.delayed(Duration.zero, () {
-                        DeleteAddressDialog.show(
-                          context,
-                          onConfirm: () {
-                            addressProvider.deleteAddress(address.id);
-                          },
-                        );
+                        if (context.mounted) {
+                          DeleteAddressDialog.show(
+                            context,
+                            onConfirm: () {
+                              addressProvider.deleteAddress(address.id);
+                            },
+                          );
+                        }
                       });
                     },
                   ),

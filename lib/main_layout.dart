@@ -126,15 +126,17 @@ class _MainLayoutState extends State<MainLayout> {
           ),
 
           // Notifications Icon (Optional - for future)
-          // IconButton(
-          //   icon: const Icon(
-          //     Icons.notifications_outlined,
-          //     color: AppColors.foreground,
-          //   ),
-          //   onPressed: () {
-          //     // TODO: Navigate to notifications
-          //   },
-          // ),
+          IconButton(
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: AppColors.foreground,
+            ),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Notifications coming soon!')),
+              );
+            },
+          ),
           const SizedBox(width: 8),
         ],
         bottom: PreferredSize(

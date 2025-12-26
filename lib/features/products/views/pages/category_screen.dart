@@ -19,6 +19,7 @@ class _CategoriesViewState extends State<CategoriesView> {
   void initState() {
     super.initState();
     Future.microtask(() {
+      if (!mounted) return;
       context.read<CategoryProvider>().listenToCategories();
       context.read<ProductProvider>().listenToFeaturedProducts();
     });

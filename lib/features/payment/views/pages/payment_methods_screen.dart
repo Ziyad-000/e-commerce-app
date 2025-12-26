@@ -31,6 +31,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
 
     // Listen to payment methods
     Future.microtask(() {
+      if (!mounted) return;
       context.read<PaymentProvider>().listenToCards();
     });
   }
