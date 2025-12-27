@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/routes/app_routes.dart';
@@ -207,23 +208,7 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          item.product.imageUrl,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 80,
-                              height: 80,
-                              color: AppColors.surface2,
-                              child: const Icon(
-                                Icons.image_not_supported,
-                                color: AppColors.mutedForeground,
-                              ),
-                            );
-                          },
-                        ),
+                        child: _buildProductImage(item.product.imageUrl),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -524,6 +509,43 @@ class _CartScreenState extends State<CartScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildProductImage(String imageUrl) {
+    if (imageUrl.startsWith('http')) {
+      return Image.network(
+        imageUrl,
+        width: 80,
+        height: 80,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
+      );
+    } else if (imageUrl.isNotEmpty) {
+      try {
+        return Image.memory(
+          base64Decode(imageUrl),
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
+        );
+      } catch (e) {
+        return _buildErrorImage();
+      }
+    }
+    return _buildErrorImage();
+  }
+
+  Widget _buildErrorImage() {
+    return Container(
+      width: 80,
+      height: 80,
+      color: AppColors.surface2,
+      child: const Icon(
+        Icons.image_not_supported,
+        color: AppColors.mutedForeground,
       ),
     );
   }

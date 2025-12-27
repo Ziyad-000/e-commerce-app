@@ -28,10 +28,18 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (user != null) {
       // User is logged in
-      Navigator.pushReplacementNamed(context, AppRoutes.mainLayoutRoute);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.mainLayoutRoute,
+        (route) => false,
+      );
     } else {
       // User not logged in
-      Navigator.pushReplacementNamed(context, AppRoutes.loginRoute);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.loginRoute,
+        (route) => false,
+      );
     }
   }
 
