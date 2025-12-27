@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -311,24 +312,7 @@ class OrderDetailsScreen extends StatelessWidget {
           // Product Image
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              item.imageUrl,
-              width: 70,
-              height: 70,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 70,
-                  height: 70,
-                  color: AppColors.surface2,
-                  child: const Icon(
-                    Icons.image_not_supported,
-                    color: AppColors.mutedForeground,
-                    size: 28,
-                  ),
-                );
-              },
-            ),
+            child: _buildProductImage(item.imageUrl),
           ),
           const SizedBox(width: 12),
 
@@ -537,5 +521,43 @@ class OrderDetailsScreen extends StatelessWidget {
         }
       }
     }
+  }
+
+  Widget _buildProductImage(String imageUrl) {
+    if (imageUrl.startsWith('http')) {
+      return Image.network(
+        imageUrl,
+        width: 70,
+        height: 70,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
+      );
+    } else if (imageUrl.isNotEmpty) {
+      try {
+        return Image.memory(
+          base64Decode(imageUrl),
+          width: 70,
+          height: 70,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
+        );
+      } catch (e) {
+        return _buildErrorImage();
+      }
+    }
+    return _buildErrorImage();
+  }
+
+  Widget _buildErrorImage() {
+    return Container(
+      width: 70,
+      height: 70,
+      color: AppColors.surface2,
+      child: const Icon(
+        Icons.image_not_supported,
+        color: AppColors.mutedForeground,
+        size: 28,
+      ),
+    );
   }
 }

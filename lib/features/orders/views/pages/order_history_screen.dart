@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -470,23 +471,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              item.imageUrl,
-              width: 60,
-              height: 60,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 60,
-                  height: 60,
-                  color: AppColors.surface2,
-                  child: const Icon(
-                    Icons.image_not_supported,
-                    color: AppColors.mutedForeground,
-                  ),
-                );
-              },
-            ),
+            child: _buildProductImage(item.imageUrl),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -532,6 +517,43 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildProductImage(String imageUrl) {
+    if (imageUrl.startsWith('http')) {
+      return Image.network(
+        imageUrl,
+        width: 60,
+        height: 60,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
+      );
+    } else if (imageUrl.isNotEmpty) {
+      try {
+        return Image.memory(
+          base64Decode(imageUrl),
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
+        );
+      } catch (e) {
+        return _buildErrorImage();
+      }
+    }
+    return _buildErrorImage();
+  }
+
+  Widget _buildErrorImage() {
+    return Container(
+      width: 60,
+      height: 60,
+      color: AppColors.surface2,
+      child: const Icon(
+        Icons.image_not_supported,
+        color: AppColors.mutedForeground,
       ),
     );
   }
