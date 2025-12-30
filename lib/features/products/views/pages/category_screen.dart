@@ -1,11 +1,10 @@
 import 'package:ecommerce_app/core/routes/app_routes.dart';
 import 'package:ecommerce_app/core/theme/app_theme.dart';
+import 'package:ecommerce_app/core/widgets/universal_image.dart';
 import 'package:ecommerce_app/features/products/providers/category_provider.dart';
 import 'package:ecommerce_app/features/products/providers/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:convert';
-import 'dart:typed_data';
 
 class CategoriesView extends StatefulWidget {
   const CategoriesView({super.key});
@@ -96,7 +95,7 @@ class _CategoriesViewState extends State<CategoriesView> {
                           ),
                       itemBuilder: (context, index) {
                         final category = categoryProvider.categories[index];
-                        Uint8List imageBytes = base64Decode(category.imageUrl);
+
                         return GestureDetector(
                           onTap: () {
                             Navigator.pushNamed(
@@ -118,37 +117,21 @@ class _CategoriesViewState extends State<CategoriesView> {
                                       topLeft: Radius.circular(12),
                                       topRight: Radius.circular(12),
                                     ),
-                                    child: category.imageUrl.isNotEmpty
-                                        ? Image.memory(
-                                            imageBytes,
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return Container(
-                                                    color: AppColors.surface2,
-                                                    child: const Center(
-                                                      child: Icon(
-                                                        Icons.category,
-                                                        size: 40,
-                                                        color: AppColors
-                                                            .mutedForeground,
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                          )
-                                        : Container(
-                                            color: AppColors.surface2,
-                                            child: const Center(
-                                              child: Icon(
-                                                Icons.category,
-                                                size: 40,
-                                                color:
-                                                    AppColors.mutedForeground,
-                                              ),
-                                            ),
+                                    child: UniversalImage(
+                                      imageUrl: category.imageUrl,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorWidget: Container(
+                                        color: AppColors.surface2,
+                                        child: const Center(
+                                          child: Icon(
+                                            Icons.category,
+                                            size: 40,
+                                            color: AppColors.mutedForeground,
                                           ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 Container(

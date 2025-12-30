@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/auth_guard.dart';
+import '../../../../core/widgets/universal_image.dart';
 import '../../models/order_model.dart';
 import '../../providers/orders_provider.dart';
 
@@ -522,28 +522,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   Widget _buildProductImage(String imageUrl) {
-    if (imageUrl.startsWith('http')) {
-      return Image.network(
-        imageUrl,
-        width: 60,
-        height: 60,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
-      );
-    } else if (imageUrl.isNotEmpty) {
-      try {
-        return Image.memory(
-          base64Decode(imageUrl),
-          width: 60,
-          height: 60,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
-        );
-      } catch (e) {
-        return _buildErrorImage();
-      }
-    }
-    return _buildErrorImage();
+    return UniversalImage(
+      imageUrl: imageUrl,
+      width: 60,
+      height: 60,
+      fit: BoxFit.cover,
+      errorWidget: _buildErrorImage(),
+    );
   }
 
   Widget _buildErrorImage() {

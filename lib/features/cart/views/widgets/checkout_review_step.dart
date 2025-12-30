@@ -6,6 +6,7 @@ import '../../../orders/services/order_placement_service.dart';
 import '../../../cart/providers/cart_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../../core/widgets/universal_image.dart';
 
 class CheckoutReviewStep extends StatelessWidget {
   const CheckoutReviewStep({super.key});
@@ -110,19 +111,17 @@ class CheckoutReviewStep extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
-            child: Image.network(
-              item.product.imageUrl,
+            child: UniversalImage(
+              imageUrl: item.product.imageUrl,
               width: 60,
               height: 60,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 60,
-                  height: 60,
-                  color: AppColors.surface2,
-                  child: const Icon(Icons.image_not_supported, size: 24),
-                );
-              },
+              errorWidget: Container(
+                width: 60,
+                height: 60,
+                color: AppColors.surface2,
+                child: const Icon(Icons.image_not_supported, size: 24),
+              ),
             ),
           ),
           const SizedBox(width: 12),

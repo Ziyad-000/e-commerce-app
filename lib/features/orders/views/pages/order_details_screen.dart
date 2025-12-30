@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/order_status_timeline.dart';
+import '../../../../core/widgets/universal_image.dart';
 import '../widgets/order_status_live_view.dart';
 import '../../models/order_model.dart';
 
@@ -524,28 +524,13 @@ class OrderDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildProductImage(String imageUrl) {
-    if (imageUrl.startsWith('http')) {
-      return Image.network(
-        imageUrl,
-        width: 70,
-        height: 70,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
-      );
-    } else if (imageUrl.isNotEmpty) {
-      try {
-        return Image.memory(
-          base64Decode(imageUrl),
-          width: 70,
-          height: 70,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _buildErrorImage(),
-        );
-      } catch (e) {
-        return _buildErrorImage();
-      }
-    }
-    return _buildErrorImage();
+    return UniversalImage(
+      imageUrl: imageUrl,
+      width: 70,
+      height: 70,
+      fit: BoxFit.cover,
+      errorWidget: _buildErrorImage(),
+    );
   }
 
   Widget _buildErrorImage() {

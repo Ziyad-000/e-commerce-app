@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../features/products/models/product_model.dart';
 import '../routes/app_routes.dart';
 import '../theme/app_theme.dart';
+import 'universal_image.dart';
 
 class AddToCartBottomSheet extends StatelessWidget {
   final ProductModel product;
@@ -163,23 +164,21 @@ class AddToCartBottomSheet extends StatelessWidget {
                               // Product Image
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  product.imageUrl,
+                                child: UniversalImage(
+                                  imageUrl: product.imageUrl,
                                   width: 80,
                                   height: 80,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 80,
-                                      height: 80,
-                                      color: AppColors.surface2,
-                                      child: const Icon(
-                                        Icons.image_not_supported,
-                                        color: AppColors.mutedForeground,
-                                        size: 30,
-                                      ),
-                                    );
-                                  },
+                                  errorWidget: Container(
+                                    width: 80,
+                                    height: 80,
+                                    color: AppColors.surface2,
+                                    child: const Icon(
+                                      Icons.image_not_supported,
+                                      color: AppColors.mutedForeground,
+                                      size: 30,
+                                    ),
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 16),

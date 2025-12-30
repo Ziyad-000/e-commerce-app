@@ -1,9 +1,8 @@
-import 'dart:convert';
-import 'dart:typed_data';
 import 'package:ecommerce_app/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/universal_image.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../models/product_model.dart';
 
@@ -13,58 +12,11 @@ class ProductCard extends StatelessWidget {
   const ProductCard({super.key, required this.product});
 
   Widget _buildProductImage() {
-    try {
-      String imageUrl = product.imageUrl;
-
-      // Handle file:/// URIs that contain base64 data
-      if (imageUrl.startsWith('file:///')) {
-        imageUrl = imageUrl.substring(8); // Remove 'file:///'
-      }
-
-      // Check if it's a valid HTTP/HTTPS URL
-      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        return Image.network(
-          imageUrl,
-          width: double.infinity,
-          height: double.infinity,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildErrorPlaceholder();
-          },
-        );
-      }
-
-      // Otherwise treat as base64
-      String base64String = imageUrl;
-      if (base64String.contains(',')) {
-        base64String = base64String.split(',')[1];
-      }
-
-      Uint8List imageBytes = base64Decode(base64String);
-      return Image.memory(
-        imageBytes,
-        width: double.infinity,
-        height: double.infinity,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildErrorPlaceholder();
-        },
-      );
-    } catch (e) {
-      return _buildErrorPlaceholder();
-    }
-  }
-
-  Widget _buildErrorPlaceholder() {
-    return Container(
-      color: AppColors.surface2,
-      child: const Center(
-        child: Icon(
-          Icons.image_not_supported,
-          color: AppColors.mutedForeground,
-          size: 40,
-        ),
-      ),
+    return UniversalImage(
+      imageUrl: product.imageUrl,
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.cover,
     );
   }
 

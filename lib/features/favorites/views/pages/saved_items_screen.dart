@@ -3,11 +3,12 @@ import 'package:provider/provider.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/auth_guard.dart';
+import '../../../../core/widgets/add_to_cart_bottom_sheet.dart';
+import '../../../../core/widgets/universal_image.dart';
+import '../../../cart/providers/cart_provider.dart';
 import '../../providers/favorites_provider.dart';
 import '../../../products/models/product_model.dart';
 import '../../../products/views/pages/product_details_screen.dart';
-import 'dart:convert';
-import 'dart:typed_data';
 
 class SavedItemsScreen extends StatefulWidget {
   const SavedItemsScreen({super.key});
@@ -171,7 +172,7 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
     final bool onSale = product.discount != null && product.discount! > 0;
     final int discountPercentage = onSale ? product.discount!.toInt() : 0;
     final bool isOutOfStock = product.stock != null && product.stock! <= 0;
-    Uint8List imageBytes = base64Decode(product.imageUrl);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -199,22 +200,20 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
                     topLeft: Radius.circular(12),
                     topRight: Radius.circular(12),
                   ),
-                  child: Image.memory(
-                    imageBytes,
+                  child: UniversalImage(
+                    imageUrl: product.imageUrl,
                     width: double.infinity,
                     height: 220,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 220,
-                        color: AppColors.surface2,
-                        child: const Icon(
-                          Icons.image_not_supported,
-                          size: 60,
-                          color: AppColors.mutedForeground,
-                        ),
-                      );
-                    },
+                    errorWidget: Container(
+                      height: 220,
+                      color: AppColors.surface2,
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        size: 60,
+                        color: AppColors.mutedForeground,
+                      ),
+                    ),
                   ),
                 ),
 
@@ -419,7 +418,17 @@ class _SavedItemsScreenState extends State<SavedItemsScreen> {
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: isOutOfStock ? null : () {},
+                          onPressed: isOutOfStock
+                              ? null
+                              : () {
+                                  context.read<CartProvider>().addToCart(
+                                    product,
+                                  );
+                                  AddToCartBottomSheet.show(
+                                    context,
+                                    product: product,
+                                  );
+                                },
                           icon: Icon(
                             Icons.shopping_cart_outlined,
                             size: 18,

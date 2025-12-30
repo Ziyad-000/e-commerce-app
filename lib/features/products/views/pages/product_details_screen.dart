@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/add_to_cart_bottom_sheet.dart';
+import '../../../../core/widgets/universal_image.dart';
 import '../../../cart/providers/cart_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../models/product_model.dart';
-import 'dart:convert';
-import 'dart:typed_data';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductModel product;
@@ -26,7 +25,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Uint8List imageBytes = base64Decode(widget.product.imageUrl);
     final bool onSale =
         widget.product.discount != null && widget.product.discount! > 0;
     final int discountPercentage = onSale
@@ -45,22 +43,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 // Product Image
                 Stack(
                   children: [
-                    Image.memory(
-                      imageBytes,
+                    UniversalImage(
+                      imageUrl: widget.product.imageUrl,
                       width: double.infinity,
                       height: 400,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 400,
-                          color: AppColors.surface2,
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            size: 80,
-                            color: AppColors.mutedForeground,
-                          ),
-                        );
-                      },
+                      errorWidget: Container(
+                        height: 400,
+                        color: AppColors.surface2,
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          size: 80,
+                          color: AppColors.mutedForeground,
+                        ),
+                      ),
                     ),
 
                     // Back Button
